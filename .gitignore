@@ -1,0 +1,37 @@
+# Android / Kotlin
+*.class
+*.jar
+*.apk
+*.aab
+*.dex
+*.ap_
+.dex/
+bin/
+gen/
+out/
+
+# Gradle
+.gradle/
+build/
+*/build/
+local.properties
+*.iml
+.idea/
+*.hprof
+*.log
+.cxx/
+
+# Keystore
+*.jks
+*.keystore
+*.ks
+debug.keystore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+*.swp
+*.swo

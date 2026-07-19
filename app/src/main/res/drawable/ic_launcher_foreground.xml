@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Minimal launcher foreground: a stylised rule-of-thirds grid in Mauve over Mocha base.
+  Vector drawable scales cleanly to every density; no PNG assets needed for v1.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Safe-zone frame (centered 72x72 within the 108x108 adaptive icon canvas) -->
+    <path
+        android:strokeColor="#FFCBA6F7"
+        android:strokeWidth="3"
+        android:fillColor="#00000000"
+        android:pathData="M18,18 H90 V90 H18 Z" />
+    <!-- Vertical thirds -->
+    <path
+        android:strokeColor="#7FCBA6F7"
+        android:strokeWidth="2"
+        android:pathData="M42,18 V90 M66,18 V90" />
+    <!-- Horizontal thirds -->
+    <path
+        android:strokeColor="#7FCBA6F7"
+        android:strokeWidth="2"
+        android:pathData="M18,42 H90 M18,66 H90" />
+</vector>

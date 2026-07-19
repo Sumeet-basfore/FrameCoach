@@ -1,0 +1,179 @@
+import cv2
+import mediapipe as mp
+import numpy as np
+
+# Parameters
+FRAME_WIDTH = 640
+FRAME_HEIGHT = 480
+# Thresholds for fill ratio (area of box / area of frame)
+TOO_SMALL_RATIO = 0.05   # less than 5% of frame -> too small
+TOO_LARGE_RATIO = 0.5    # more than 50% of frame -> too large
+# Tolerance for being "in the third" (as fraction of third width/height)
+THIRD_TOLERANCE = 0.15   # within 15% of a third line is considered aligned
+
+def analyze_box(frame_width, frame_height, box):
+    """
+    Analyze a bounding box relative to the frame.
+    box: (x, y, w, h) in pixels, top-left corner.
+    Returns: (suggestion, is_good)
+    suggestion: string like "move left", "move right", "move up", "move down",
+                "move closer", "move away", or "good".
+    is_good: True if suggestion is "good".
+    """
+    x, y, w, h = box
+    box_area = w * h
+    frame_area = frame_width * frame_height
+    fill_ratio = box_area / frame_area
+
+    # Check size
+    if fill_ratio < TOO_SMALL_RATIO:
+        return ("move closer", False)
+    if fill_ratio > TOO_LARGE_RATIO:
+        return ("move away", False)
+
+    # Compute center of box
+    cx = x + w / 2
+    cy = y + h / 2
+
+    # Third lines
+    third_w = frame_width / 3
+    third_h = frame_height / 3
+    left_third = third_w
+    right_third = 2 * third_w
+    top_third = third_h
+    bottom_third = 2 * third_h
+
+    # Horizontal deviation
+    if cx < left_third:
+        h_sugg = "move right"
+        h_dist = left_third - cx
+    elif cx > right_third:
+        h_sugg = "move left"
+        h_dist = cx - right_third
+    else:
+        h_sugg = None
+        h_dist = min(abs(cx - left_third), abs(cx - right_third))
+
+    # Vertical deviation
+    if cy < top_third:
+        v_sugg = "move down"
+        v_dist = top_third - cy
+    elif cy > bottom_third:
+        v_sugg = "move up"
+        v_dist = cy - bottom_third
+    else:
+        v_sugg = None
+        v_dist = min(abs(cy - top_third), abs(cy - bottom_third))
+
+    # If both within tolerance, good
+    if h_sugg is None and v_sugg is None:
+        return ("good", True)
+
+    # Choose the direction with larger deviation (or prioritize horizontal?)
+    # For simplicity, we'll prioritize horizontal if both needed, but we can also combine.
+    # We'll just return the horizontal suggestion if exists else vertical.
+    if h_sugg is not None:
+        return (h_sugg, False)
+    else:
+        return (v_sugg, False)
+
+def draw_guidance(frame, box, suggestion):
+    """Draw the bounding box and suggestion on the frame."""
+    x, y, w, h = box
+    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    # Draw third lines
+    h_third = frame.shape[1] // 3
+    v_third = frame.shape[0] // 3
+    for i in range(1, 3):
+        cv2.line(frame, (i * h_third, 0), (i * h_third, frame.shape[0]), (255, 0, 0), 1)
+        cv2.line(frame, (0, i * v_third), (frame.shape[1], i * v_third), (255, 0, 0), 1)
+    # Put suggestion text
+    cv2.putText(frame, suggestion, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+    return frame
+
+def test_with_synthetic():
+    """Test with a variety of synthetic boxes."""
+    print("Testing synthetic boxes...")
+    test_cases = [
+        # (box, expected_suggestion, description)
+        ((150, 200, 100, 100), "move closer", "small box, left-center"),
+        ((50, 200, 100, 100), "move closer", "small box, far left"),
+        ((500, 200, 100, 100), "move closer", "small box, far right"),
+        ((300, 200, 20, 20), "move closer", "very small box"),
+        ((200, 150, 300, 300), "good", "large box, center"),
+        ((163, 110, 100, 100), "move closer", "small box, near top-left intersection"),
+        ((100, 200, 200, 200), "move right", "medium size, left of center"),
+        ((400, 200, 200, 200), "move left", "medium size, right of center"),
+        ((200, 100, 200, 200), "move down", "medium size, above center"),
+        ((200, 400, 200, 200), "move up", "medium size, below center"),
+        ((213, 160, 100, 100), "good", "centered at top-left intersection"),
+        ((427, 320, 100, 100), "good", "centered at bottom-right intersection"),
+        ((213, 160, 50, 50), "move closer", "small box at center"),
+        ((213, 160, 400, 400), "move away", "large box at center"),
+        ((100, 100, 100, 100), "move right", "small box, top-left corner"),
+        ((500, 300, 100, 100), "move left", "small box, bottom-right corner"),
+    ]
+
+    all_passed = True
+    for box, expected, desc in test_cases:
+        suggestion, good = analyze_box(FRAME_WIDTH, FRAME_HEIGHT, box)
+        if suggestion == expected:
+            print(f"PASS: {desc} -> {suggestion}")
+        else:
+            print(f"FAIL: {desc} -> expected {expected}, got {suggestion}")
+            all_passed = False
+
+    if all_passed:
+        print("\nAll synthetic tests passed!")
+    else:
+        print("\nSome synthetic tests failed!")
+
+def test_with_webcam():
+    """Optional: test with webcam using MediaPipe detection."""
+    print("\nStarting webcam test (press 'q' to quit)...")
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("Cannot open webcam")
+        return
+    mp_face_detection = mp.solutions.face_detection
+    with mp_face_detection.FaceDetection(model_selection=0, min_detection_confidence=0.5) as face_detector:
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            # Flip horizontally for selfie view
+            frame = cv2.flip(frame, 1)
+            h, w, _ = frame.shape
+            # Convert to RGB for MediaPipe
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            results = face_detector.process(rgb_frame)
+            boxes = []
+            if results.detections:
+                for detection in results.detections:
+                    bboxC = detection.location_data.relative_bounding_box
+                    x = int(bboxC.xmin * w)
+                    y = int(bboxC.ymin * h)
+                    width = int(bboxC.width * w)
+                    height = int(bboxC.height * h)
+                    boxes.append((x, y, width, height))
+            # For simplicity, use the first detected face (largest? but we just take first)
+            if boxes:
+                # Choose the largest box by area
+                boxes = sorted(boxes, key=lambda b: b[2]*b[3], reverse=True)
+                box = boxes[0]
+                suggestion, _ = analyze_box(w, h, box)
+                frame = draw_guidance(frame, box, suggestion)
+            else:
+                # No face detected
+                cv2.putText(frame, "No face detected", (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            cv2.imshow('Frame', frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    test_with_synthetic()
+    # Uncomment to test with webcam
+    # test_with_webcam()

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Frame</string>
+
+    <!-- Permission rationale / denied states (03_Security_Access_Document.md §4) -->
+    <string name="camera_permission_title">Camera access needed</string>
+    <string name="camera_permission_rationale">Frame needs your camera to show a live composition coach.
+        It never uploads or shares frames — all coaching happens on-device.</string>
+    <string name="camera_permission_denied">Camera permission was denied or is permanently blocked.
+        To use Frame, allow camera access in system settings.</string>
+    <string name="camera_permission_open_settings">Open app settings</string>
+    <string name="camera_permission_grant">Grant camera access</string>
+</resources>

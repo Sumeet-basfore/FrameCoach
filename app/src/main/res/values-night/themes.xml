@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Mocha is dark-first; night qualifier carries the same window styling. -->
+    <style name="Theme.Frame" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@color/mocha_base</item>
+        <item name="android:navigationBarColor">@color/mocha_base</item>
+        <item name="android:windowBackground">@color/mocha_base</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

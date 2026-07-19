@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Catppuccin Mocha — see 04_Frontend_Specification_Document.md §1.
+         Compose Color.kt is the source of truth for UI; these XML values back the
+         manifest theme (status/nav bar, window background) before Compose draws. -->
+    <color name="mocha_base">#FF1E1E2E</color>
+    <color name="mocha_mantle">#FF181825</color>
+    <color name="mocha_text">#FFCDD6F4</color>
+    <color name="mocha_mauve">#FFCBA6F7</color>
+    <color name="mocha_green">#FFA6E3A1</color>
+</resources>

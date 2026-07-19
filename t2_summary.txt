@@ -1,0 +1,5 @@
+# T2 Prototype: Composition Rules Algorithm
+
+## Overview
+Successfully implemented and tested the composition rules algorithm for the AI Camera Composition Assistant.
+

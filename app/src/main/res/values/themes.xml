@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Catppuccin Mocha is a dark theme by design (see 04_Frontend_Specification_Document.md).
+      We use a base Material3 theme here and let Compose override all colors; the manifest theme
+      parent is what the window uses before the first frame is drawn.
+    -->
+    <style name="Theme.Frame" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@color/mocha_base</item>
+        <item name="android:navigationBarColor">@color/mocha_base</item>
+        <item name="android:windowBackground">@color/mocha_base</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>
