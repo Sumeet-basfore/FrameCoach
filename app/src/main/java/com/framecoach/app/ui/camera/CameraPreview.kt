@@ -20,6 +20,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import com.framecoach.app.detection.ExposureAnalyzer
+import com.framecoach.app.detection.ExposureState
 import com.framecoach.app.detection.FrameProcessor
 import com.framecoach.app.ui.overlay.CompositionState
 import kotlinx.coroutines.CoroutineScope
@@ -80,6 +82,9 @@ fun CameraPreview(
     // Remember the frame processor (tied to component lifetime).
     val frameProcessor = remember { FrameProcessor(context) }
 
+    // T12: exposure analyzer
+    val exposureAnalyzer = remember { ExposureAnalyzer() }
+
     // Remember the ImageCapture instance to pass back to the parent.
     var imageCapture by remember { mutableStateOf<ImageCapture?>(null) }
 
@@ -123,6 +128,18 @@ fun CameraPreview(
                     // ImageProxy lifetime is managed here — close in finally so it is
                     // never leaked regardless of cancellation, exception, or success.
                     imageAnalysis.setAnalyzer(mainExecutor) { imageProxy: ImageProxy ->
+                        // T12: extract Y plane for exposure analysis BEFORE processFrame
+                        // closes the ImageProxy.
+                        val yPlane = imageProxy.planes.getOrNull(0)
+                        if (yPlane != null) {
+                            val yBuffer = yPlane.buffer.duplicate()
+                            yBuffer.rewind()
+                            val exposureResult = exposureAnalyzer.analyse(
+                                yBuffer, imageProxy.width, imageProxy.height
+                            )
+                            ExposureState.update(exposureResult)
+                        }
+
                         val job = coroutineScope.launch {
                             try {
                                 val boxes = frameProcessor.processFrame(imageProxy, currentMode.value)

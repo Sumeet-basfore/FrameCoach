@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
+import com.framecoach.app.detection.ExposureState
 import com.framecoach.app.ui.overlay.CompositionOverlay
 import com.framecoach.app.ui.overlay.CompositionState
 import com.framecoach.app.ui.overlay.HapticController
@@ -104,6 +105,9 @@ fun CameraScreen(
     val hapticsEnabled by prefs.hapticsEnabled.collectAsState()
     val cameraMode by prefs.cameraMode.collectAsState()
     val compositionStyle by prefs.compositionStyle.collectAsState()
+
+    // T12: collect exposure state
+    val exposureResult by ExposureState.result.collectAsState()
 
     var permissionState by androidx.compose.runtime.remember { mutableStateOf<CameraPermissionState>(CameraPermissionState.Unknown) }
     var hasRequestedBefore by androidx.compose.runtime.remember { mutableStateOf(false) }
@@ -271,6 +275,29 @@ fun CameraScreen(
                                     shape = RoundedCornerShape(8.dp)
                                 )
                                 .padding(horizontal = 10.dp, vertical = 4.dp),
+                        )
+                    }
+
+                    // T12: Exposure warning badge — below the zoom indicator
+                    if (exposureResult.isWarning) {
+                        val label = when {
+                            exposureResult.isUnderexposed -> "UNDEREXPOSED"
+                            else -> "OVEREXPOSED"
+                        }
+                        val badgeColor = MochaYellow
+                        Text(
+                            text = label,
+                            color = MochaBase,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .padding(start = 16.dp, top = 88.dp)
+                                .background(
+                                    color = badgeColor,
+                                    shape = RoundedCornerShape(6.dp)
+                                )
+                                .padding(horizontal = 8.dp, vertical = 3.dp),
                         )
                     }
                 }
