@@ -13,7 +13,6 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.unit.dp
 import com.framecoach.app.sensors.HorizonLevelCalculator
 import com.framecoach.app.sensors.HorizonSensor
-import com.framecoach.app.ui.theme.MochaGreen
 import com.framecoach.app.ui.theme.MochaYellow
 
 /**
@@ -72,6 +71,7 @@ private fun DrawScope.drawHorizonIndicator(
     // Line spans 60 % of the narrower canvas dimension so it stays on screen.
     val halfLineLen = minOf(size.width, size.height) * 0.30f
     val strokeWidth = 2.dp.toPx()
+    val glowWidth = 8.dp.toPx()
     val tickHeight = 10.dp.toPx()
     val bubbleRadius = 6.dp.toPx()
 
@@ -80,7 +80,15 @@ private fun DrawScope.drawHorizonIndicator(
 
     // Rotate the entire drawing around the canvas centre by the roll angle.
     rotate(degrees = rollDeg, pivot = Offset(cx, cy)) {
-        // Horizontal reference line.
+        // Glow layer — draw a thicker, more transparent line beneath the main one.
+        drawLine(
+            color = lineColor.copy(alpha = 0.15f),
+            start = Offset(cx - halfLineLen, cy),
+            end = Offset(cx + halfLineLen, cy),
+            strokeWidth = glowWidth,
+        )
+
+        // Main horizontal reference line.
         drawLine(
             color = lineColor,
             start = Offset(cx - halfLineLen, cy),
@@ -115,8 +123,15 @@ private fun DrawScope.drawHorizonIndicator(
 
     // Bubble: drawn AFTER the rotate block so it stays upright and migrates
     // horizontally, giving an intuitive spirit-level metaphor.
-    // Bubble position: offset by normalisedTilt * halfLineLen from centre.
     val bubbleX = cx + normalisedTilt * halfLineLen
+
+    // Bubble outer glow
+    drawCircle(
+        color = lineColor.copy(alpha = 0.2f),
+        radius = bubbleRadius * 2f,
+        center = Offset(bubbleX, cy),
+    )
+    // Bubble fill
     drawCircle(
         color = lineColor,
         center = Offset(bubbleX, cy),

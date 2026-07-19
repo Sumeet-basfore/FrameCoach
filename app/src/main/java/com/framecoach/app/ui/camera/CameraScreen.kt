@@ -3,33 +3,61 @@ package com.framecoach.app.ui.camera
 import android.Manifest
 import android.app.Activity
 import android.content.ContentValues
-import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.Camera
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.FlashAuto
+import androidx.compose.material.icons.filled.FlashOff
+import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LifecycleOwner
+import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import android.content.pm.PackageManager
 import com.framecoach.app.ui.overlay.CompositionOverlay
 import com.framecoach.app.ui.overlay.CompositionState
@@ -39,27 +67,15 @@ import com.framecoach.app.ui.settings.AppPreferences
 import com.framecoach.app.sensors.HorizonSensor
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCapture.OutputFileOptions
-import androidx.camera.core.ImageCapture.OnImageSavedCallback
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import com.framecoach.app.ui.theme.MochaBase
 import com.framecoach.app.ui.theme.MochaMantle
 import com.framecoach.app.ui.theme.MochaMauve
 import com.framecoach.app.ui.theme.MochaSubtext0
+import com.framecoach.app.ui.theme.MochaText
+import com.framecoach.app.ui.theme.MochaYellow
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * Top-level camera screen: manages the CAMERA runtime-permission lifecycle.
@@ -92,6 +108,14 @@ fun CameraScreen(
     var permissionState by androidx.compose.runtime.remember { mutableStateOf<CameraPermissionState>(CameraPermissionState.Unknown) }
     var hasRequestedBefore by androidx.compose.runtime.remember { mutableStateOf(false) }
     var imageCapture by androidx.compose.runtime.remember { mutableStateOf<ImageCapture?>(null) }
+
+    // Zoom & flash state
+    var camera by remember { mutableStateOf<Camera?>(null) }
+    var currentZoomRatio by remember { mutableFloatStateOf(1f) }
+    var showZoomLevel by remember { mutableStateOf(false) }
+    var hideZoomJob by remember { mutableStateOf<Job?>(null) }
+    var flashMode by remember { mutableIntStateOf(ImageCapture.FLASH_MODE_OFF) }
+    val scope = rememberCoroutineScope()
 
     // T8: haptic controller — one instance per composition, reset when context changes.
     val hapticController = remember(context) { HapticController(context) }
@@ -196,15 +220,34 @@ fun CameraScreen(
             // Use a Box as the root to allow stacking.
             Box(modifier = modifier.fillMaxSize()) {
                 // This box contains the camera preview and overlay, filling the entire screen.
+                // Pinch-to-zoom gesture is detected at this level.
                 Box(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .pointerInput(Unit) {
+                            detectTransformGestures { _, _, zoom, _ ->
+                                val cam = camera ?: return@detectTransformGestures
+                                val zs = cam.cameraInfo.zoomState.value ?: return@detectTransformGestures
+                                val newZoom = (currentZoomRatio * zoom)
+                                    .coerceIn(zs.minZoomRatio, zs.maxZoomRatio)
+                                cam.cameraControl.setZoomRatio(newZoom)
+                                currentZoomRatio = newZoom
+                                showZoomLevel = true
+                                hideZoomJob?.cancel()
+                                hideZoomJob = scope.launch {
+                                    delay(2000L)
+                                    showZoomLevel = false
+                                }
+                            }
+                        }
                 ) {
                     CameraPreview(
                         lifecycleOwner = lifecycleOwner,
                         cameraMode = cameraMode,
                         compositionStyle = compositionStyle,
                         modifier = Modifier.fillMaxSize(),
-                        onImageCaptureChanged = { ic -> imageCapture = ic }
+                        onImageCaptureChanged = { ic -> imageCapture = ic },
+                        onCameraReady = { cam -> camera = cam }
                     )
                     // T10: pass showGrid preference to the overlay.
                     CompositionOverlay(
@@ -212,7 +255,136 @@ fun CameraScreen(
                         compositionStyle = compositionStyle
                     )
                     HorizonOverlay(horizonSensor = horizonSensor)
+
+                    // Zoom level indicator — overlay below the flash toggle at top-left
+                    if (showZoomLevel) {
+                        Text(
+                            text = "${"%.1f".format(currentZoomRatio)}x",
+                            color = MochaText,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .padding(start = 16.dp, top = 56.dp)
+                                .background(
+                                    color = MochaBase.copy(alpha = 0.7f),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(horizontal = 10.dp, vertical = 4.dp),
+                        )
+                    }
                 }
+
+                // Flash toggle — top-left corner.
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(8.dp)
+                ) {
+                    val flashIcon = when (flashMode) {
+                        ImageCapture.FLASH_MODE_ON -> Icons.Default.FlashOn
+                        ImageCapture.FLASH_MODE_AUTO -> Icons.Default.FlashAuto
+                        else -> Icons.Default.FlashOff
+                    }
+                    val flashDesc = when (flashMode) {
+                        ImageCapture.FLASH_MODE_ON -> "Flash on"
+                        ImageCapture.FLASH_MODE_AUTO -> "Flash auto"
+                        else -> "Flash off"
+                    }
+                    IconButton(
+                        onClick = {
+                            if (imageCapture == null) return@IconButton
+                            flashMode = when (flashMode) {
+                                ImageCapture.FLASH_MODE_OFF -> ImageCapture.FLASH_MODE_ON
+                                ImageCapture.FLASH_MODE_ON -> ImageCapture.FLASH_MODE_AUTO
+                                else -> ImageCapture.FLASH_MODE_OFF
+                            }
+                            imageCapture?.setFlashMode(flashMode)
+                        },
+                        enabled = imageCapture != null,
+                    ) {
+                        Icon(
+                            imageVector = flashIcon,
+                            contentDescription = flashDesc,
+                            tint = if (imageCapture == null) MochaMantle else when (flashMode) {
+                                ImageCapture.FLASH_MODE_OFF -> MochaSubtext0
+                                ImageCapture.FLASH_MODE_AUTO -> MochaYellow
+                                else -> MochaYellow
+                            },
+                        )
+                    }
+                }
+
+                // Zoom +/- buttons — right edge.
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    IconButton(
+                        onClick = {
+                            val cam = camera ?: return@IconButton
+                            val zs = cam.cameraInfo.zoomState.value ?: return@IconButton
+                            val range = zs.maxZoomRatio - zs.minZoomRatio
+                            val zoomStep = (range / 10f).coerceAtLeast(0.1f)
+                            val newZoom = (currentZoomRatio + zoomStep)
+                                .coerceIn(zs.minZoomRatio, zs.maxZoomRatio)
+                            cam.cameraControl.setZoomRatio(newZoom)
+                            currentZoomRatio = newZoom
+                            showZoomLevel = true
+                            hideZoomJob?.cancel()
+                            hideZoomJob = scope.launch {
+                                delay(2000L)
+                                showZoomLevel = false
+                            }
+                        },
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(
+                                color = MochaBase.copy(alpha = 0.7f),
+                                shape = CircleShape
+                            ),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Zoom in",
+                            tint = MochaText,
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            val cam = camera ?: return@IconButton
+                            val zs = cam.cameraInfo.zoomState.value ?: return@IconButton
+                            val range = zs.maxZoomRatio - zs.minZoomRatio
+                            val zoomStep = (range / 10f).coerceAtLeast(0.1f)
+                            val newZoom = (currentZoomRatio - zoomStep)
+                                .coerceIn(zs.minZoomRatio, zs.maxZoomRatio)
+                            cam.cameraControl.setZoomRatio(newZoom)
+                            currentZoomRatio = newZoom
+                            showZoomLevel = true
+                            hideZoomJob?.cancel()
+                            hideZoomJob = scope.launch {
+                                delay(2000L)
+                                showZoomLevel = false
+                            }
+                        },
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(
+                                color = MochaBase.copy(alpha = 0.7f),
+                                shape = CircleShape
+                            ),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Remove,
+                            contentDescription = "Zoom out",
+                            tint = MochaText,
+                        )
+                    }
+                }
+
                 // Settings gear icon — top-right corner.
                 IconButton(
                     onClick = onNavigateToSettings,
@@ -223,7 +395,7 @@ fun CameraScreen(
                     Icon(
                         imageVector = Icons.Default.Settings,
                         contentDescription = "Settings",
-                        tint = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.85f),
+                        tint = MochaSubtext0.copy(alpha = 0.85f),
                     )
                 }
                 // Shutter button & camera mode selector at the bottom center.
@@ -277,9 +449,10 @@ fun CameraScreen(
                             disabledContainerColor = MochaMantle
                         )
                     ) {
-                        Text(
-                            text = "Capture",
-                            style = MaterialTheme.typography.labelSmall
+                        Icon(
+                            imageVector = Icons.Default.CameraAlt,
+                            contentDescription = "Capture photo",
+                            modifier = Modifier.size(28.dp),
                         )
                     }
                 }

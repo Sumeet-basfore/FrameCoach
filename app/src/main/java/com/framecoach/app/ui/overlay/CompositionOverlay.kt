@@ -8,10 +8,10 @@ import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.framecoach.app.ui.overlay.CompositionState
 import com.framecoach.app.rules.CompositionSuggestion
 import com.framecoach.app.rules.Direction
@@ -72,13 +72,35 @@ private fun DrawScope.drawGrid(
 ) {
     val gridColor = if (isGood) MochaGreen else MochaOverlay1.copy(alpha = 0.4f)
     val strokeWidth = 2.dp.toPx()
+    val lowRatio = if (compositionStyle == "golden_ratio") 0.382f else 1f / 3f
+    val highRatio = if (compositionStyle == "golden_ratio") 0.618f else 2f / 3f
+
     gridLines(
         canvasWidth = canvasWidth,
         canvasHeight = canvasHeight,
         color = gridColor,
         strokeWidth = strokeWidth,
-        style = compositionStyle
+        lowRatio = lowRatio,
+        highRatio = highRatio,
     )
+
+    // Crosshair intersection markers — small circles at the four grid-line crossings.
+    val dotRadius = 3.dp.toPx()
+    val dotColor = if (isGood) MochaGreen else MochaOverlay1.copy(alpha = 0.5f)
+    val xs = listOf(canvasWidth * lowRatio, canvasWidth * highRatio)
+    val ys = listOf(canvasHeight * lowRatio, canvasHeight * highRatio)
+    for (x in xs) {
+        for (y in ys) {
+            drawCircle(color = dotColor, radius = dotRadius, center = Offset(x, y))
+            // Outer ring for subtle emphasis
+            drawCircle(
+                color = dotColor.copy(alpha = 0.3f),
+                radius = dotRadius * 2.5f,
+                center = Offset(x, y),
+                style = Stroke(width = 1.dp.toPx()),
+            )
+        }
+    }
 }
 
 /**
@@ -89,11 +111,9 @@ private fun DrawScope.gridLines(
     canvasHeight: Float,
     color: Color,
     strokeWidth: Float,
-    style: String
+    lowRatio: Float,
+    highRatio: Float,
 ) {
-    val lowRatio = if (style == "golden_ratio") 0.382f else 1f / 3f
-    val highRatio = if (style == "golden_ratio") 0.618f else 2f / 3f
-
     // Vertical lines
     val x1 = canvasWidth * lowRatio
     val x2 = canvasWidth * highRatio
@@ -128,7 +148,8 @@ private fun DrawScope.gridLines(
 }
 
 /**
- * Draw directional indicator based on composition suggestion.
+ * Draw directional indicator based on composition suggestion — a filled arrow
+ * triangle pointing the way the camera should move.
  *
  * @param canvasWidth  Width of the canvas in pixels
  * @param canvasHeight Height of the canvas in pixels
@@ -142,32 +163,62 @@ private fun DrawScope.drawDirectionIndicator(
     // Center of the canvas
     val centerX = canvasWidth / 2
     val centerY = canvasHeight / 2
-    
-    // Simple visual indicator - draw a colored circle in the direction needed
-    val indicatorRadius = 20.dp.toPx()
-    val offset = 60.dp.toPx() // Distance from center
-    
-    val (x, y) = when (direction) {
-        Direction.UP -> Pair(centerX, centerY - offset)
-        Direction.DOWN -> Pair(centerX, centerY + offset)
-        Direction.LEFT -> Pair(centerX - offset, centerY)
-        Direction.RIGHT -> Pair(centerX + offset, centerY)
-        Direction.CLOSER -> Pair(centerX, centerY - offset) // Up
-        Direction.AWAY -> Pair(centerX, centerY + offset) // Down
-        else -> Pair(centerX, centerY) // Center (shouldn't happen for non-None)
+
+    val arrowSize = 28.dp.toPx()
+    val offset = 60.dp.toPx() // Distance of the arrow center from the screen centre
+
+    val tip = when (direction) {
+        Direction.UP -> Offset(centerX, centerY - offset - arrowSize * 0.5f)
+        Direction.DOWN -> Offset(centerX, centerY + offset + arrowSize * 0.5f)
+        Direction.LEFT -> Offset(centerX - offset - arrowSize * 0.5f, centerY)
+        Direction.RIGHT -> Offset(centerX + offset + arrowSize * 0.5f, centerY)
+        Direction.CLOSER -> Offset(centerX, centerY - offset - arrowSize * 0.5f)
+        Direction.AWAY -> Offset(centerX, centerY + offset + arrowSize * 0.5f)
+        else -> return
     }
-    
-    // Choose color based on direction type
+
     val color = when (direction) {
         Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT, Direction.CLOSER -> MochaPeach
         Direction.AWAY -> MochaRed
-        else -> Color.White
+        else -> MochaPeach
     }
-    
-    // Draw the indicator circle
-    drawCircle(
+
+    // Build an arrow path: tip + two base corners = isosceles triangle.
+    val arrowPath = Path().apply {
+        when (direction) {
+            Direction.UP, Direction.CLOSER -> {
+                moveTo(tip.x, tip.y)
+                lineTo(tip.x - arrowSize * 0.5f, tip.y + arrowSize)
+                lineTo(tip.x + arrowSize * 0.5f, tip.y + arrowSize)
+            }
+            Direction.DOWN, Direction.AWAY -> {
+                moveTo(tip.x, tip.y)
+                lineTo(tip.x - arrowSize * 0.5f, tip.y - arrowSize)
+                lineTo(tip.x + arrowSize * 0.5f, tip.y - arrowSize)
+            }
+            Direction.LEFT -> {
+                moveTo(tip.x, tip.y)
+                lineTo(tip.x + arrowSize, tip.y - arrowSize * 0.5f)
+                lineTo(tip.x + arrowSize, tip.y + arrowSize * 0.5f)
+            }
+            Direction.RIGHT -> {
+                moveTo(tip.x, tip.y)
+                lineTo(tip.x - arrowSize, tip.y - arrowSize * 0.5f)
+                lineTo(tip.x - arrowSize, tip.y + arrowSize * 0.5f)
+            }
+            else -> {}
+        }
+        close()
+    }
+
+    // Draw the arrow with a semi-transparent fill and a solid stroke.
+    drawPath(
+        path = arrowPath,
+        color = color.copy(alpha = 0.7f),
+    )
+    drawPath(
+        path = arrowPath,
         color = color,
-        center = Offset(x, y),
-        radius = indicatorRadius
+        style = Stroke(width = 2.dp.toPx()),
     )
 }

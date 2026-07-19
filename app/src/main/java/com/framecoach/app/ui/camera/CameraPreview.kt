@@ -1,6 +1,7 @@
 package com.framecoach.app.ui.camera
 
 import android.util.Size
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -60,7 +61,8 @@ fun CameraPreview(
     cameraMode: String,
     compositionStyle: String,
     modifier: Modifier = Modifier,
-    onImageCaptureChanged: ((ImageCapture?) -> Unit)? = null
+    onImageCaptureChanged: ((ImageCapture?) -> Unit)? = null,
+    onCameraReady: ((Camera) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val mainExecutor = ContextCompat.getMainExecutor(context)
@@ -142,8 +144,8 @@ fun CameraPreview(
                     // Unbind before rebinding.
                     cameraProvider.unbindAll()
 
-                    // Bind all three use cases to lifecycle.
-                    cameraProvider.bindToLifecycle(
+                    // Bind all three use cases to lifecycle and get the Camera handle.
+                    val camera = cameraProvider.bindToLifecycle(
                         lifecycleOwner,
                         CameraSelector.DEFAULT_BACK_CAMERA,
                         preview,
@@ -154,6 +156,7 @@ fun CameraPreview(
                     // Update the remembered imageCapture instance and notify parent.
                     imageCapture = capturedImageCapture
                     onImageCaptureChanged?.invoke(capturedImageCapture)
+                    onCameraReady?.invoke(camera)
                 }, mainExecutor)
             }
         },

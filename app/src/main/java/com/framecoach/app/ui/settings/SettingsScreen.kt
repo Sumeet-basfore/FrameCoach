@@ -14,9 +14,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.GridOn
+import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,26 +31,22 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.framecoach.app.ui.theme.MochaBase
 import com.framecoach.app.ui.theme.MochaMantle
 import com.framecoach.app.ui.theme.MochaMauve
+import com.framecoach.app.ui.theme.MochaOverlay1
 import com.framecoach.app.ui.theme.MochaSubtext0
+import com.framecoach.app.ui.theme.MochaSurface
 import com.framecoach.app.ui.theme.MochaText
 
 /**
  * Settings screen for toggling grid overlay and haptic feedback (T10).
  *
- * Designed per 04_Frontend_Specification_Document.md §3:
- *   "standard Material list items, toggle switches for grid/haptics, no
- *    unnecessary nested navigation."
- *
- * Changes are written immediately to [AppPreferences] (and thus to
- * SharedPreferences) on every toggle flip, satisfying the acceptance criterion
- * "Toggled settings persist across app restarts."
- *
- * @param prefs            The [AppPreferences] instance to read from and write to.
- * @param onNavigateBack   Called when the user taps the back arrow.
+ * Designed per 04_Frontend_Specification_Document.md §3.
+ * Changes are written immediately to [AppPreferences] on every toggle flip.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,56 +89,102 @@ fun SettingsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
+            // --- Visual section ---
+            SectionLabel(text = "Viewfinder")
+
             Spacer(modifier = Modifier.height(8.dp))
 
-            SettingsToggleRow(
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.GridOn,
-                        contentDescription = null,
-                        tint = MochaMauve,
-                    )
-                },
-                title = "Grid overlay",
-                subtitle = "Show composition guide lines over the viewfinder",
-                checked = gridEnabled,
-                onCheckedChange = { prefs.setGridEnabled(it) },
-            )
+            SectionCard {
+                SettingsToggleRow(
+                    icon = Icons.Default.GridOn,
+                    title = "Grid overlay",
+                    subtitle = "Show composition guide lines over the viewfinder",
+                    checked = gridEnabled,
+                    onCheckedChange = { prefs.setGridEnabled(it) },
+                )
 
-            HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                color = MochaMantle,
-            )
+                SettingsDivider()
 
-            SettingsToggleRow(
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Vibration,
-                        contentDescription = null,
-                        tint = MochaMauve,
-                    )
-                },
-                title = "Haptic feedback",
-                subtitle = "Vibrate once when the composition enters the good zone",
-                checked = hapticsEnabled,
-                onCheckedChange = { prefs.setHapticsEnabled(it) },
-            )
+                SettingsToggleRow(
+                    icon = Icons.Default.Vibration,
+                    title = "Haptic feedback",
+                    subtitle = "Vibrate once when the composition enters the good zone",
+                    checked = hapticsEnabled,
+                    onCheckedChange = { prefs.setHapticsEnabled(it) },
+                )
+            }
 
-            HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                color = MochaMantle,
-            )
+            Spacer(modifier = Modifier.height(24.dp))
 
-            SettingsStyleRow(
-                title = "Grid composition style",
-                subtitle = "Choose between the rule of thirds and the golden ratio (phi grid)",
-                selectedStyle = compositionStyle,
-                onStyleChange = { prefs.setCompositionStyle(it) },
-            )
+            // --- Composition section ---
+            SectionLabel(text = "Composition")
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            SectionCard {
+                SettingsStyleRow(
+                    icon = Icons.Default.Style,
+                    title = "Grid style",
+                    subtitle = "Rule of thirds or golden ratio (phi grid)",
+                    selectedStyle = compositionStyle,
+                    onStyleChange = { prefs.setCompositionStyle(it) },
+                )
+            }
         }
     }
+}
+
+// ---------------------------------------------------------------------------
+// Shared section components
+// ---------------------------------------------------------------------------
+
+/**
+ * Section header label rendered above each card group.
+ */
+@Composable
+private fun SectionLabel(text: String) {
+    Text(
+        text = text.uppercase(),
+        style = MaterialTheme.typography.labelMedium,
+        color = MochaMauve,
+        fontWeight = FontWeight.SemiBold,
+        letterSpacing = androidx.compose.ui.unit.TextUnit(1.5f, androidx.compose.ui.unit.TextUnitType.Sp),
+        modifier = Modifier.padding(start = 4.dp),
+    )
+}
+
+/**
+ * Wraps child items in a rounded card over MochaSurface.
+ */
+@Composable
+private fun SectionCard(content: @Composable () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = MochaSurface,
+                shape = RoundedCornerShape(16.dp),
+            ),
+    ) {
+        content()
+    }
+}
+
+/**
+ * Thin horizontal divider used between rows inside a SectionCard.
+ */
+@Composable
+private fun SettingsDivider() {
+    Spacer(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(0.5.dp)
+            .padding(start = 52.dp)
+            .background(MochaOverlay1.copy(alpha = 0.15f)),
+    )
 }
 
 // ---------------------------------------------------------------------------
@@ -154,7 +196,7 @@ fun SettingsScreen(
  */
 @Composable
 private fun SettingsToggleRow(
-    icon: @Composable () -> Unit,
+    icon: ImageVector,
     title: String,
     subtitle: String,
     checked: Boolean,
@@ -164,15 +206,23 @@ private fun SettingsToggleRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Leading icon
-        icon()
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MochaMauve,
+            modifier = Modifier
+                .background(
+                    color = MochaMauve.copy(alpha = 0.1f),
+                    shape = RoundedCornerShape(10.dp),
+                )
+                .padding(8.dp),
+        )
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(14.dp))
 
-        // Title + subtitle
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
@@ -187,9 +237,8 @@ private fun SettingsToggleRow(
             )
         }
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(12.dp))
 
-        // Trailing switch
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
@@ -208,6 +257,7 @@ private fun SettingsToggleRow(
  */
 @Composable
 private fun SettingsStyleRow(
+    icon: ImageVector,
     title: String,
     subtitle: String,
     selectedStyle: String,
@@ -217,57 +267,78 @@ private fun SettingsStyleRow(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
     ) {
-        Column {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MochaText,
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MochaMauve,
+                modifier = Modifier
+                    .background(
+                        color = MochaMauve.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(10.dp),
+                    )
+                    .padding(8.dp),
             )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MochaSubtext0,
-            )
+            Spacer(modifier = Modifier.width(14.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MochaText,
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MochaSubtext0,
+                )
+            }
         }
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(14.dp))
         Row(
             modifier = Modifier
+                .fillMaxWidth()
                 .background(
                     color = MochaMantle,
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(14.dp)
                 )
                 .padding(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             val isThirds = selectedStyle == AppPreferences.STYLE_RULE_OF_THIRDS
             val isGolden = selectedStyle == AppPreferences.STYLE_GOLDEN_RATIO
-            
+
             Text(
                 text = "Rule of Thirds",
                 color = if (isThirds) MochaBase else MochaSubtext0,
                 style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Medium,
                 modifier = Modifier
+                    .weight(1f)
                     .background(
                         color = if (isThirds) MochaMauve else androidx.compose.ui.graphics.Color.Transparent,
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(12.dp)
                     )
                     .clickable { onStyleChange(AppPreferences.STYLE_RULE_OF_THIRDS) }
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(vertical = 10.dp),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             )
             Text(
                 text = "Golden Ratio",
                 color = if (isGolden) MochaBase else MochaSubtext0,
                 style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Medium,
                 modifier = Modifier
+                    .weight(1f)
                     .background(
                         color = if (isGolden) MochaMauve else androidx.compose.ui.graphics.Color.Transparent,
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(12.dp)
                     )
                     .clickable { onStyleChange(AppPreferences.STYLE_GOLDEN_RATIO) }
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(vertical = 10.dp),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             )
         }
     }

@@ -23,5 +23,6 @@ val MochaPeach = Color(0xFFFAB387)        // Needs-adjustment indicator
 val MochaYellow = Color(0xFFF9E2AF)       // Warning (low light/confidence)
 val MochaRed = Color(0xFFF38BA8)          // Error
 
-// -- Overlay / chrome --
+// -- Surfaces / chrome --
+val MochaSurface = Color(0xFF313244)      // Surface0 — card backgrounds, slightly above Mantle
 val MochaOverlay1 = Color(0xFF7F849C)     // Grid lines at ~40% opacity
