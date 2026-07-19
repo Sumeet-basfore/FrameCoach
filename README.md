@@ -215,13 +215,13 @@ FrameCoach/
 flowchart TD
     A[CameraX ImageAnalysis] --> B{AdaptiveFrameGate}
     B -->|Should Process?| C[FrameProcessor]
-    C --> D[MediaPipe Detector<br/>(Object/Face)]
-    D --> E[Normalized BoundingBox<br/>(0-1 coordinates)]
-    E --> F[CompositionState<br/>(Shared StateFlow)]
-    F --> G[Composition Overlay<br/>(Grid + Direction Indicator)]
-    F --> H[Horizon Overlay<br/>(Tilt Indicator)]
-    F --> I[Haptic Controller<br/>(Vibration on Good Zone Entry)]
-    B -->|Skip Frame| J[Return Empty List<br/>(Maintain Preview Smoothness)]
+    C --> D["MediaPipe Detector (Object/Face)"]
+    D --> E["Normalized BoundingBox (0–1 coords)"]
+    E --> F["CompositionState (Shared StateFlow)"]
+    F --> G["Composition Overlay (Grid + Direction Indicator)"]
+    F --> H["Horizon Overlay (Tilt Indicator)"]
+    F --> I["Haptic Controller (Vibration on Good Zone Entry)"]
+    B -->|Skip Frame| J["Return Empty List (Maintain Preview Smoothness)"]
 ```
 
 ### Key Components
