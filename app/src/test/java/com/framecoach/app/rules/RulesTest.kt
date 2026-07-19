@@ -470,4 +470,88 @@ class RulesTest {
         val resultWithPrev = CompositionRules.analyse(box, previousSuggestion = prevSuggestionLarge)
         assertEquals("Flip should be allowed due to large improvement delta", Direction.RIGHT, resultWithPrev.direction)
     }
+
+    // -------------------------------------------------------------------------
+    // T13 — Product mode tests
+    // -------------------------------------------------------------------------
+
+    @Test
+    fun `product mode centred subject at rule-of-thirds not good`() {
+        // Centre at (0.5, 0.5), size 0.55×0.55 → area 0.3025 → near 0.35 product peak.
+        // Position is (0.5, 0.5), inside CENTER [0.35, 0.65] → good.
+        val box = BoundingBox(
+            label = "product",
+            confidence = 0.9f,
+            left = 0.225f, top = 0.225f,
+            right = 0.775f, bottom = 0.775f,
+        )
+        val result = CompositionRules.analyse(box, mode = "product")
+        assertTrue(result.isGood)
+        assertEquals(Direction.NONE, result.direction)
+    }
+
+    @Test
+    fun `product mode off-center subject that would be good under thirds needs adjustment`() {
+        // Area = 0.35 (exactly at product peak of 0.35). Under general, nearest peak is
+        // 0.56 (dist² = 0.044 > 0.0025 → CLOSER). Under product, nearest peak is
+        // 0.35 (dist² = 0 → size good). Then position: cx = 0.34 < 0.35 → RIGHT.
+        // This demonstrates product mode reaching different results than general.
+        val box = BoundingBox(
+            label = "product",
+            confidence = 0.9f,
+            left = 0.044f, top = 0.204f,
+            right = 0.636f, bottom = 0.796f,
+        )
+
+        val generalResult = CompositionRules.analyse(box, mode = "general")
+        assertEquals("Under general, nearest peak is 0.56 → CLOSER", Direction.CLOSER, generalResult.direction)
+
+        val productResult = CompositionRules.analyse(box, mode = "product")
+        assertEquals("Under product, position outside CENTER band → RIGHT", Direction.RIGHT, productResult.direction)
+    }
+
+    @Test
+    fun `product mode tight fill ratio target`() {
+        // Area = 0.01 (too small for both general's 0.10 peak and product's 0.35 peak)
+        val box = BoundingBox(
+            label = "product",
+            confidence = 0.9f,
+            left = 0.45f, top = 0.45f,
+            right = 0.55f, bottom = 0.55f,
+        )
+        val result = CompositionRules.analyse(box, mode = "product")
+        assertEquals(Direction.CLOSER, result.direction)
+    }
+
+    @Test
+    fun `product mode large object near center peak`() {
+        // Area ≈ 0.36. Distance to nearest product peak (0.35) = 0.0001 < 0.0025 → good size.
+        // Centre at (0.5, 0.5) → good position.
+        val box = BoundingBox(
+            label = "product",
+            confidence = 0.9f,
+            left = 0.20f, top = 0.20f,
+            right = 0.80f, bottom = 0.80f,
+        )
+        val result = CompositionRules.analyse(box, mode = "product")
+        assertTrue(result.isGood)
+    }
+
+    @Test
+    fun `product mode small object nearer to general peak still gets closer`() {
+        // Area ≈ 0.0676. Nearest general peak = 0.10 (dist²=0.0010), product peak = 0.35 (dist²=0.079).
+        // Under general: close enough to 0.10 → size good.
+        // Under product: far from 0.35 → CLOSER.
+        val box = BoundingBox(
+            label = "product",
+            confidence = 0.9f,
+            left = 0.36f, top = 0.36f,
+            right = 0.62f, bottom = 0.62f,
+        )
+        val generalResult = CompositionRules.analyse(box, mode = "general")
+        assertTrue("Under general mode this should be good size", generalResult.isGood)
+
+        val productResult = CompositionRules.analyse(box, mode = "product")
+        assertEquals("Under product mode this needs to be closer", Direction.CLOSER, productResult.direction)
+    }
 }

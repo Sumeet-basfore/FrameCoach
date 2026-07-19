@@ -30,6 +30,7 @@ class AppPreferences(context: Context) {
 
         const val MODE_GENERAL = "general"
         const val MODE_PORTRAIT = "portrait"
+        const val MODE_PRODUCT = "product"
 
         const val STYLE_RULE_OF_THIRDS = "rule_of_thirds"
         const val STYLE_GOLDEN_RATIO = "golden_ratio"

@@ -451,6 +451,14 @@ fun CameraScreen(
                                 .padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                         Text(
+                            text = "PRODUCT",
+                            color = if (cameraMode == AppPreferences.MODE_PRODUCT) MochaMauve else MochaSubtext0,
+                            style = MaterialTheme.typography.labelLarge,
+                            modifier = Modifier
+                                .clickable { prefs.setCameraMode(AppPreferences.MODE_PRODUCT) }
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        )
+                        Text(
                             text = "PORTRAIT",
                             color = if (cameraMode == AppPreferences.MODE_PORTRAIT) MochaMauve else MochaSubtext0,
                             style = MaterialTheme.typography.labelLarge,

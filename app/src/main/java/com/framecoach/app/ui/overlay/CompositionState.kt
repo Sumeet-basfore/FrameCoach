@@ -21,18 +21,19 @@ object CompositionState {
     /** Latest composition analysis result. */
     val suggestion: StateFlow<CompositionSuggestion> = _suggestion.asStateFlow()
 
-     /**
+    /**
      * Update the composition analysis based on detected boxes.
      * 
-     * @param boxes List of detected bounding boxes from the current frame
-     * @param style Active composition coaching style ("rule_of_thirds" or "golden_ratio")
+     * @param boxes      List of detected bounding boxes from the current frame
+     * @param style      Active composition coaching style ("rule_of_thirds" or "golden_ratio")
+     * @param mode       Active camera mode ("general", "portrait", or "product")
      */
-    fun update(boxes: List<BoundingBox>, style: String = "rule_of_thirds") {
+    fun update(boxes: List<BoundingBox>, style: String = "rule_of_thirds", mode: String = "general") {
         val suggestion = when {
             boxes.isEmpty() -> CompositionSuggestion.GOOD
             else -> {
                 val largestBox = boxes.maxByOrNull { it.area }!!
-                CompositionRules.analyse(largestBox, style, _suggestion.value)
+                CompositionRules.analyse(largestBox, style, mode, _suggestion.value)
             }
         }
         _suggestion.value = suggestion

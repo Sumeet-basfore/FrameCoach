@@ -144,7 +144,7 @@ fun CameraPreview(
                             try {
                                 val boxes = frameProcessor.processFrame(imageProxy, currentMode.value)
                                 // MutableStateFlow.value is thread-safe; no Main dispatcher needed.
-                                CompositionState.update(boxes, currentStyle.value)
+                                CompositionState.update(boxes, currentStyle.value, currentMode.value)
                             } catch (e: Exception) {
                                 // FrameProcessor.processFrame already closes the proxy in finally,
                                 // but guard against any early-exit path.

@@ -12,7 +12,7 @@ Real-time, fully offline camera-composition coach for Android. Analyzes the live
 - No backend, no server, no cloud AI calls, no login
 
 ## Current Status (as of 2026-07-19)
-All must-have tickets T1–T7 and should-have T8–T10 are complete, with research-informed retrofits successfully completed. Codebase error audit conducted: addressed potential race conditions in detector lifecycles, aligned overlay indicators with Catppuccin Mocha theme specifications, and updated state-lifecycle keys. Build compiles; 62 unit tests passing.
+All must-have tickets T1–T7, should-have T8–T10, and nice-to-have T11–T13 are complete. Build compiles; **79 unit tests passing**.
 
 ### Completed Tasks
 - **T1**: CameraX setup (Preview use case) - completed
@@ -56,6 +56,19 @@ All must-have tickets T1–T7 and should-have T8–T10 are complete, with resear
   - `CameraPreview` updated: Accepts `cameraMode` and wraps with `rememberUpdatedState` to avoid capturing stale values in analyzer callback
   - `CameraScreen` updated: Added a premium, Catppuccin Mocha themed pill-shaped mode selector row above the shutter button
   - Added unit test in `RulesTest.kt` to verify face bounding boxes drive the rules engine identically to general objects (all 54 unit tests passing)
+- **T12**: Exposure histogram warning - completed
+  - `ExposureAnalyzer` (pure Kotlin, `detection/`): samples Y-plane luminance on 32x32 grid, classifies as overexposed (>85%) or underexposed (<25%)
+  - `ExposureState` (`detection/`): shared StateFlow following `CompositionState` pattern
+  - `CameraPreview`: extracts Y plane before `ImageProxy` is closed, runs exposure analysis per frame
+  - `CameraScreen`: collects exposure state and shows yellow "UNDEREXPOSED" / "OVEREXPOSED" badge at top-left
+  - 10 unit tests covering boundaries, checkerboard, small/asymmetric frames
+- **T13**: Product photography preset mode - completed
+  - `CompositionRules.analyse()`: new `mode` param (`"general"`, `"portrait"`, `"product"`)
+  - Product mode: centered positioning band [0.35, 0.65] instead of thirds, tighter fill-ratio peaks at 35% and 62%
+  - `CompositionState.update()`: threads `mode` to rules engine
+  - `CameraPreview`: passes `currentMode` to `CompositionState.update()`
+  - `CameraScreen`: PRODUCT button added to mode selector row
+  - 5 unit tests verifying product mode differs from general for same scene
 
 - **Codebase Error Audit / Cleanup**:
   - Addressed potential race conditions in MediaPipe's `ObjectDetector` and `FaceDetector` helpers during lifecycle transitions. Introduced synchronized blocks with a thread-safe `closeLock` and `@Volatile` `isClosed` flag to prevent calling `detect()` on closed detectors and to avoid concurrent resource cleanup/inference execution.
@@ -63,5 +76,8 @@ All must-have tickets T1–T7 and should-have T8–T10 are complete, with resear
   - Standardized state lifecycle tracking for haptic controls in `CameraScreen` by keying `LaunchedEffect` with the dynamic `hapticsEnabled` state.
 
 ### Next Steps / Up Next
-1. **T12 — Exposure histogram warning** (nice-to-have v2):
-   - Basic luminance histogram check on the analysis frame to flag significantly over/underexposed scenes.
+All tickets T1–T13 are complete. Potential v2+ enhancements:
+- Audio coaching cues
+- Video recording with overlays burned in
+- Cloud sync for shot history
+- Learned aesthetic scoring model
