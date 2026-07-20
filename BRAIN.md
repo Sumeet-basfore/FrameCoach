@@ -92,12 +92,17 @@ All must-have tickets T1–T7, should-have T8–T10, and nice-to-have T11–T13 
   - `CameraScreen`: shutter, settings gear, flash toggle, zoom in/out, mode tabs — all carry `contentDescription`.
   - `OnboardingOverlay`: dismiss button carries semantic label.
 
+- **C1 — Audio coaching cues**:
+  - `AudioCoach` (`ui/overlay/`): Android on-device `TextToSpeech` wrapper firing speech cues only on direction-change edges (same edge-fire pattern as `GoodZoneEdgeDetector`).
+  - `AppPreferences`: added `audioCoachingEnabled` (defaults to false / off by default).
+  - `SettingsScreen`: added "Audio coaching" toggle row under Viewfinder section.
+  - `CameraScreen`: wired `AudioCoach` lifecycle with `DisposableEffect` and dynamic preference gating.
+  - Unit tests in `AudioCoachTest.kt` verifying cue mapping and `DirectionGate` edge-suppression logic.
+
 ### Next Steps / Up Next
-- **A2**: Physical device matrix test (budget → flagship, API 24 boundary)
-- **Generate keystore**: `keytool -genkey -v -keystore framecoach-release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias framecoach`
-- **B3**: Landscape orientation lock already applied in manifest; verify overlay Canvas math if needed
-- **C1**: Audio coaching cues (Android TTS, on-device, off by default, `AudioCoach` class in `ui/`)
 - **C2**: Shot history log (Room, local-only, no sync)
+- **A2**: Physical device matrix test (budget → flagship, API 24 boundary)
+- **B3**: Landscape orientation lock already applied in manifest; verify overlay Canvas math if needed
 - **D1**: Compose instrumented UI tests
 - **D2**: GitHub Actions CI pipeline
 
