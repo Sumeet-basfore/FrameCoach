@@ -27,6 +27,10 @@ class AppPreferences(context: Context) {
         const val KEY_HAPTICS_ENABLED = "haptics_enabled"
         const val KEY_CAMERA_MODE = "camera_mode"
         const val KEY_COMPOSITION_STYLE = "composition_style"
+        /** Set to true the first time the user dismisses the onboarding overlay (B1). */
+        const val KEY_ONBOARDING_SHOWN = "onboarding_shown"
+        /** Audio coaching cues via on-device TTS (C1). Off by default. */
+        const val KEY_AUDIO_COACHING_ENABLED = "audio_coaching_enabled"
 
         const val MODE_GENERAL = "general"
         const val MODE_PORTRAIT = "portrait"
@@ -99,5 +103,45 @@ class AppPreferences(context: Context) {
     fun setCompositionStyle(style: String) {
         prefs.edit().putString(KEY_COMPOSITION_STYLE, style).apply()
         _compositionStyle.value = style
+    }
+
+    // -------------------------------------------------------------------------
+    // Onboarding (B1)
+    // -------------------------------------------------------------------------
+
+    private val _onboardingShown = MutableStateFlow(
+        prefs.getBoolean(KEY_ONBOARDING_SHOWN, false)
+    )
+
+    /**
+     * Whether the first-launch onboarding overlay has been dismissed at least once.
+     * Defaults to false so new installs always see the tutorial.
+     */
+    val onboardingShown: StateFlow<Boolean> = _onboardingShown.asStateFlow()
+
+    /** Persist that the onboarding overlay has been dismissed. */
+    fun setOnboardingShown(shown: Boolean) {
+        prefs.edit().putBoolean(KEY_ONBOARDING_SHOWN, shown).apply()
+        _onboardingShown.value = shown
+    }
+
+    // -------------------------------------------------------------------------
+    // Audio coaching (C1)
+    // -------------------------------------------------------------------------
+
+    private val _audioCoachingEnabled = MutableStateFlow(
+        prefs.getBoolean(KEY_AUDIO_COACHING_ENABLED, false)   // off by default
+    )
+
+    /**
+     * Whether audio coaching cues (TTS) are active.
+     * Defaults to **false** — users opt in rather than being surprised by speech.
+     */
+    val audioCoachingEnabled: StateFlow<Boolean> = _audioCoachingEnabled.asStateFlow()
+
+    /** Persist and publish a new [audioCoachingEnabled] value. */
+    fun setAudioCoachingEnabled(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_AUDIO_COACHING_ENABLED, enabled).apply()
+        _audioCoachingEnabled.value = enabled
     }
 }

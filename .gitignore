@@ -35,3 +35,8 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# AI tooling / session artifacts
+.claude-flow/
+.commandcode/
+.kotlin/

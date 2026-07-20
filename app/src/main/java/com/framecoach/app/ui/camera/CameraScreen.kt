@@ -60,12 +60,16 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
 import com.framecoach.app.detection.ExposureState
+import com.framecoach.app.ui.overlay.AudioCoach
 import com.framecoach.app.ui.overlay.CompositionOverlay
 import com.framecoach.app.ui.overlay.CompositionState
 import com.framecoach.app.ui.overlay.HapticController
 import com.framecoach.app.ui.overlay.HorizonOverlay
+import com.framecoach.app.ui.overlay.OnboardingOverlay
 import com.framecoach.app.ui.settings.AppPreferences
 import com.framecoach.app.sensors.HorizonSensor
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCapture.OutputFileOptions
 import com.framecoach.app.ui.theme.MochaBase
@@ -105,6 +109,10 @@ fun CameraScreen(
     val hapticsEnabled by prefs.hapticsEnabled.collectAsState()
     val cameraMode by prefs.cameraMode.collectAsState()
     val compositionStyle by prefs.compositionStyle.collectAsState()
+    // B1: onboarding — show overlay until dismissed on first launch.
+    val onboardingShown by prefs.onboardingShown.collectAsState()
+    // C1: audio coaching preference.
+    val audioCoachingEnabled by prefs.audioCoachingEnabled.collectAsState()
 
     // T12: collect exposure state
     val exposureResult by ExposureState.result.collectAsState()
@@ -131,6 +139,21 @@ fun CameraScreen(
             if (hapticsEnabled) {
                 hapticController.onCompositionUpdate(suggestion.isGood)
             }
+        }
+    }
+
+    // C1: Audio coach — on-device TTS, fires only on direction-change edges.
+    val audioCoach = remember(context) { AudioCoach(context) }
+    DisposableEffect(lifecycleOwner) {
+        audioCoach.init()
+        onDispose { audioCoach.shutdown() }
+    }
+    // Reset spoken-direction state whenever the toggle is flipped so the next
+    // update always fires a fresh cue rather than being suppressed as a repeat.
+    LaunchedEffect(audioCoachingEnabled) {
+        audioCoach.reset()
+        CompositionState.suggestion.collect { suggestion ->
+            audioCoach.onDirectionUpdate(suggestion.direction, audioCoachingEnabled)
         }
     }
 
@@ -260,6 +283,14 @@ fun CameraScreen(
                     )
                     HorizonOverlay(horizonSensor = horizonSensor)
 
+                    // B1: First-launch onboarding overlay — stacked on top of the preview
+                    // and all other overlays so it occludes the full viewfinder.
+                    OnboardingOverlay(
+                        visible = !onboardingShown,
+                        onDismiss = { prefs.setOnboardingShown(true) },
+                        modifier = Modifier.fillMaxSize(),
+                    )
+
                     // Zoom level indicator — overlay below the flash toggle at top-left
                     if (showZoomLevel) {
                         Text(
@@ -332,7 +363,7 @@ fun CameraScreen(
                     ) {
                         Icon(
                             imageVector = flashIcon,
-                            contentDescription = flashDesc,
+                            contentDescription = flashDesc,   // B2: already set above
                             tint = if (imageCapture == null) MochaMantle else when (flashMode) {
                                 ImageCapture.FLASH_MODE_OFF -> MochaSubtext0
                                 ImageCapture.FLASH_MODE_AUTO -> MochaYellow
@@ -376,7 +407,7 @@ fun CameraScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Zoom in",
+                            contentDescription = "Zoom in",  // B2
                             tint = MochaText,
                         )
                     }
@@ -406,13 +437,13 @@ fun CameraScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Remove,
-                            contentDescription = "Zoom out",
+                            contentDescription = "Zoom out",  // B2
                             tint = MochaText,
                         )
                     }
                 }
 
-                // Settings gear icon — top-right corner.
+                // Settings gear icon — top-right corner (B2: contentDescription already set).
                 IconButton(
                     onClick = onNavigateToSettings,
                     modifier = Modifier
@@ -421,7 +452,7 @@ fun CameraScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
-                        contentDescription = "Settings",
+                        contentDescription = "Open settings",  // B2
                         tint = MochaSubtext0.copy(alpha = 0.85f),
                     )
                 }
@@ -448,6 +479,7 @@ fun CameraScreen(
                             style = MaterialTheme.typography.labelLarge,
                             modifier = Modifier
                                 .clickable { prefs.setCameraMode(AppPreferences.MODE_GENERAL) }
+                                .semantics { contentDescription = "General mode — tap to select" }  // B2
                                 .padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                         Text(
@@ -456,6 +488,7 @@ fun CameraScreen(
                             style = MaterialTheme.typography.labelLarge,
                             modifier = Modifier
                                 .clickable { prefs.setCameraMode(AppPreferences.MODE_PRODUCT) }
+                                .semantics { contentDescription = "Product mode — tap to select" }  // B2
                                 .padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                         Text(
@@ -464,6 +497,7 @@ fun CameraScreen(
                             style = MaterialTheme.typography.labelLarge,
                             modifier = Modifier
                                 .clickable { prefs.setCameraMode(AppPreferences.MODE_PORTRAIT) }
+                                .semantics { contentDescription = "Portrait mode — tap to select" }  // B2
                                 .padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                     }
@@ -486,7 +520,7 @@ fun CameraScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.CameraAlt,
-                            contentDescription = "Capture photo",
+                            contentDescription = "Capture photo",  // B2
                             modifier = Modifier.size(28.dp),
                         )
                     }

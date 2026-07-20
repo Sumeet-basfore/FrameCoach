@@ -4,9 +4,22 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <!-- Required for haptic "good zone" feedback (T8). VIBRATE is a normal permission — no runtime prompt. -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!--
+        WRITE_EXTERNAL_STORAGE is only needed on API 24–28.
+        API 29+ uses scoped storage via MediaStore (T6 capture flow) and does not require it.
+    -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
 
-    <!-- Camera hardware is preferred but not required (so the app still installs on camera-less devices). -->
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <!--
+        No INTERNET permission is declared intentionally.
+        FrameCoach is fully offline — no network calls occur anywhere in the detection
+        or rules pipeline. This is the product's core differentiator (see AGENTS.md).
+    -->
+
+    <!-- Camera is required — restricts Play Store distribution to camera-equipped devices. -->
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
     <application

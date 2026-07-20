@@ -11,8 +11,8 @@ Real-time, fully offline camera-composition coach for Android. Analyzes the live
 - Kotlin Coroutines for off-main-thread frame processing
 - No backend, no server, no cloud AI calls, no login
 
-## Current Status (as of 2026-07-19)
-All must-have tickets T1–T7, should-have T8–T10, and nice-to-have T11–T13 are complete. Build compiles; **79 unit tests passing**.
+## Current Status (as of 2026-07-20)
+All must-have tickets T1–T7, should-have T8–T10, and nice-to-have T11–T13 are complete. Build compiles; **82 unit tests passing**.
 
 ### Completed Tasks
 - **T1**: CameraX setup (Preview use case) - completed
@@ -75,8 +75,33 @@ All must-have tickets T1–T7, should-have T8–T10, and nice-to-have T11–T13 
   - Refined grid overlay design to strictly follow `04_Frontend_Specification_Document.md` spacing and color roles. Replaced hardcoded material colors with Catppuccin Mocha tokens (`MochaGreen` for good zone, `MochaOverlay1` at 40% opacity for default grid, `MochaPeach` for directional adjustments, `MochaRed` for limits).
   - Standardized state lifecycle tracking for haptic controls in `CameraScreen` by keying `LaunchedEffect` with the dynamic `hapticsEnabled` state.
 
+- **A1 — Release prep** (v1.0):
+  - `versionName` bumped to `1.0.0`; signing config reads `KEYSTORE_PATH / KEYSTORE_PASSWORD / KEY_ALIAS / KEY_PASSWORD` from `local.properties` or env vars; `isShrinkResources = true` added.
+  - `AndroidManifest.xml`: `WRITE_EXTERNAL_STORAGE` (maxSdkVersion 28), camera `required="true"`, absence of `INTERNET` documented.
+
+- **A3 — Store copy & strings**:
+  - App renamed from "Frame" → "FrameCoach" in `strings.xml`. Permission rationale updated. Accessibility `contentDescription` string resources added.
+
+- **B1 — First-launch onboarding overlay**:
+  - `AppPreferences`: `KEY_ONBOARDING_SHOWN` + `onboardingShown: StateFlow<Boolean>` + `setOnboardingShown()`.
+  - `OnboardingOverlay` (`ui/overlay/`): animated Compose overlay with three tips (grid, directional arrows, good-zone pulse), "Got it" button. Shown once on first install.
+  - `CameraScreen`: renders `OnboardingOverlay` when `!onboardingShown`.
+  - 4 new unit tests in `OnboardingPreferenceTest`.
+
+- **B2 — Accessibility content descriptions**:
+  - `CameraScreen`: shutter, settings gear, flash toggle, zoom in/out, mode tabs — all carry `contentDescription`.
+  - `OnboardingOverlay`: dismiss button carries semantic label.
+
 ### Next Steps / Up Next
-All tickets T1–T13 are complete. Potential v2+ enhancements:
+- **A2**: Physical device matrix test (budget → flagship, API 24 boundary)
+- **Generate keystore**: `keytool -genkey -v -keystore framecoach-release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias framecoach`
+- **B3**: Landscape orientation lock already applied in manifest; verify overlay Canvas math if needed
+- **C1**: Audio coaching cues (Android TTS, on-device, off by default, `AudioCoach` class in `ui/`)
+- **C2**: Shot history log (Room, local-only, no sync)
+- **D1**: Compose instrumented UI tests
+- **D2**: GitHub Actions CI pipeline
+
+v2+ deferred enhancements:
 - Audio coaching cues
 - Video recording with overlays burned in
 - Cloud sync for shot history

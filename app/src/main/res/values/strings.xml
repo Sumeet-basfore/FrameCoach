@@ -1,13 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Frame</string>
+    <string name="app_name">FrameCoach</string>
 
     <!-- Permission rationale / denied states (03_Security_Access_Document.md §4) -->
     <string name="camera_permission_title">Camera access needed</string>
-    <string name="camera_permission_rationale">Frame needs your camera to show a live composition coach.
+    <string name="camera_permission_rationale">FrameCoach needs your camera to show a live composition coach.
         It never uploads or shares frames — all coaching happens on-device.</string>
     <string name="camera_permission_denied">Camera permission was denied or is permanently blocked.
-        To use Frame, allow camera access in system settings.</string>
+        To use FrameCoach, allow camera access in system settings.</string>
     <string name="camera_permission_open_settings">Open app settings</string>
     <string name="camera_permission_grant">Grant camera access</string>
+
+    <!--
+        Play Store listing copy (A3).
+        Short description (≤80 chars): used as the store tagline.
+    -->
+    <string name="store_short_description">Real-time composition coach. Rule of thirds, framing, horizon. 100% offline.</string>
+
+    <!-- Accessibility content descriptions for interactive UI elements (B2) -->
+    <string name="cd_shutter">Capture photo</string>
+    <string name="cd_settings">Open settings</string>
+    <string name="cd_flash_off">Flash off — tap to enable flash</string>
+    <string name="cd_flash_on">Flash on — tap for auto flash</string>
+    <string name="cd_flash_auto">Flash auto — tap to disable flash</string>
+    <string name="cd_zoom_in">Zoom in</string>
+    <string name="cd_zoom_out">Zoom out</string>
+    <string name="cd_mode_general">General mode — tap to select</string>
+    <string name="cd_mode_portrait">Portrait mode — tap to select</string>
+    <string name="cd_mode_product">Product mode — tap to select</string>
+    <string name="cd_onboarding_dismiss">Got it — dismiss coaching tips</string>
 </resources>

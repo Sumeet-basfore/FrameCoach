@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.GridOn
+import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,6 +59,7 @@ fun SettingsScreen(
     val gridEnabled by prefs.gridEnabled.collectAsState()
     val hapticsEnabled by prefs.hapticsEnabled.collectAsState()
     val compositionStyle by prefs.compositionStyle.collectAsState()
+    val audioCoachingEnabled by prefs.audioCoachingEnabled.collectAsState()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -114,6 +116,16 @@ fun SettingsScreen(
                     subtitle = "Vibrate once when the composition enters the good zone",
                     checked = hapticsEnabled,
                     onCheckedChange = { prefs.setHapticsEnabled(it) },
+                )
+
+                SettingsDivider()
+
+                SettingsToggleRow(
+                    icon = Icons.Default.RecordVoiceOver,
+                    title = "Audio coaching",
+                    subtitle = "Speak directional cues aloud using on-device speech",
+                    checked = audioCoachingEnabled,
+                    onCheckedChange = { prefs.setAudioCoachingEnabled(it) },
                 )
             }
 

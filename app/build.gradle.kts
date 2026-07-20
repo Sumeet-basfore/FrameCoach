@@ -1,7 +1,18 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+}
+
+// Load signing credentials from local.properties (never commit this file).
+// Keys: KEYSTORE_PATH, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD
+// If any key is missing the release build will still assemble but will be
+// unsigned — CI/CD should inject these as environment variables instead.
+val localProps = Properties().apply {
+    val localFile = rootProject.file("local.properties")
+    if (localFile.exists()) localFile.inputStream().use { load(it) }
 }
 
 android {
@@ -13,9 +24,31 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
+    }
+
+    signingConfigs {
+        create("release") {
+            val keystorePath = localProps.getProperty("KEYSTORE_PATH")
+                ?: System.getenv("KEYSTORE_PATH")
+            val keystorePassword = localProps.getProperty("KEYSTORE_PASSWORD")
+                ?: System.getenv("KEYSTORE_PASSWORD")
+            val keyAlias = localProps.getProperty("KEY_ALIAS")
+                ?: System.getenv("KEY_ALIAS")
+            val keyPassword = localProps.getProperty("KEY_PASSWORD")
+                ?: System.getenv("KEY_PASSWORD")
+
+            if (keystorePath != null && keystorePassword != null &&
+                keyAlias != null && keyPassword != null
+            ) {
+                storeFile = file(keystorePath)
+                storePassword = keystorePassword
+                this.keyAlias = keyAlias
+                this.keyPassword = keyPassword
+            }
+        }
     }
 
     buildTypes {
@@ -24,10 +57,12 @@ android {
         }
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
