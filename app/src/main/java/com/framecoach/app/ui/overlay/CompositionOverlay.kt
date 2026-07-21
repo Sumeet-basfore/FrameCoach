@@ -15,10 +15,10 @@ import androidx.compose.ui.unit.dp
 import com.framecoach.app.ui.overlay.CompositionState
 import com.framecoach.app.rules.CompositionSuggestion
 import com.framecoach.app.rules.Direction
-import com.framecoach.app.ui.theme.MochaGreen
-import com.framecoach.app.ui.theme.MochaPeach
-import com.framecoach.app.ui.theme.MochaRed
-import com.framecoach.app.ui.theme.MochaOverlay1
+import com.framecoach.app.ui.theme.SuccessIce
+import com.framecoach.app.ui.theme.SurfaceMedium
+import com.framecoach.app.ui.theme.AccentSage
+import com.framecoach.app.ui.theme.ErrorPlum
 
 /**
  * Overlay that draws the composition guide: 3x3 grid and directional indicator.
@@ -70,10 +70,18 @@ private fun DrawScope.drawGrid(
     isGood: Boolean,
     compositionStyle: String
 ) {
-    val gridColor = if (isGood) MochaGreen else MochaOverlay1.copy(alpha = 0.4f)
+    val gridColor = if (isGood) SuccessIce else SurfaceMedium.copy(alpha = 0.4f)
     val strokeWidth = 2.dp.toPx()
-    val lowRatio = if (compositionStyle == "golden_ratio") 0.382f else 1f / 3f
-    val highRatio = if (compositionStyle == "golden_ratio") 0.618f else 2f / 3f
+    val lowRatio = when (compositionStyle) {
+        "golden_ratio" -> 0.382f
+        "center_grid" -> 0.35f
+        else -> 1f / 3f
+    }
+    val highRatio = when (compositionStyle) {
+        "golden_ratio" -> 0.618f
+        "center_grid" -> 0.65f
+        else -> 2f / 3f
+    }
 
     gridLines(
         canvasWidth = canvasWidth,
@@ -86,7 +94,7 @@ private fun DrawScope.drawGrid(
 
     // Crosshair intersection markers — small circles at the four grid-line crossings.
     val dotRadius = 3.dp.toPx()
-    val dotColor = if (isGood) MochaGreen else MochaOverlay1.copy(alpha = 0.5f)
+    val dotColor = if (isGood) SuccessIce else SurfaceMedium.copy(alpha = 0.5f)
     val xs = listOf(canvasWidth * lowRatio, canvasWidth * highRatio)
     val ys = listOf(canvasHeight * lowRatio, canvasHeight * highRatio)
     for (x in xs) {
@@ -178,9 +186,9 @@ private fun DrawScope.drawDirectionIndicator(
     }
 
     val color = when (direction) {
-        Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT, Direction.CLOSER -> MochaPeach
-        Direction.AWAY -> MochaRed
-        else -> MochaPeach
+        Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT, Direction.CLOSER -> AccentSage
+        Direction.AWAY -> ErrorPlum
+        else -> AccentSage
     }
 
     // Build an arrow path: tip + two base corners = isosceles triangle.

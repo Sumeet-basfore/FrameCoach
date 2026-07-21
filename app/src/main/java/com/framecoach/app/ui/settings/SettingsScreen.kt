@@ -35,13 +35,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.framecoach.app.ui.theme.MochaBase
-import com.framecoach.app.ui.theme.MochaMantle
-import com.framecoach.app.ui.theme.MochaMauve
-import com.framecoach.app.ui.theme.MochaOverlay1
-import com.framecoach.app.ui.theme.MochaSubtext0
-import com.framecoach.app.ui.theme.MochaSurface
-import com.framecoach.app.ui.theme.MochaText
+import com.framecoach.app.ui.theme.CanvasDark
+import com.framecoach.app.ui.theme.SurfaceDeep
+import com.framecoach.app.ui.theme.AccentSage
+import com.framecoach.app.ui.theme.TextSecondary
+import com.framecoach.app.ui.theme.SurfaceMedium
+import com.framecoach.app.ui.theme.TextPrimary
 
 /**
  * Settings screen for toggling grid overlay and haptic feedback (T10).
@@ -63,14 +62,14 @@ fun SettingsScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = MochaBase,
+        containerColor = CanvasDark,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         text = "Settings",
                         style = MaterialTheme.typography.titleLarge,
-                        color = MochaText,
+                        color = TextPrimary,
                     )
                 },
                 navigationIcon = {
@@ -78,12 +77,12 @@ fun SettingsScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back to camera",
-                            tint = MochaText,
+                            tint = TextPrimary,
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MochaMantle,
+                    containerColor = SurfaceDeep,
                 ),
             )
         },
@@ -161,7 +160,7 @@ private fun SectionLabel(text: String) {
     Text(
         text = text.uppercase(),
         style = MaterialTheme.typography.labelMedium,
-        color = MochaMauve,
+        color = AccentSage,
         fontWeight = FontWeight.SemiBold,
         letterSpacing = androidx.compose.ui.unit.TextUnit(1.5f, androidx.compose.ui.unit.TextUnitType.Sp),
         modifier = Modifier.padding(start = 4.dp),
@@ -177,7 +176,7 @@ private fun SectionCard(content: @Composable () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                color = MochaSurface,
+                color = SurfaceMedium,
                 shape = RoundedCornerShape(16.dp),
             ),
     ) {
@@ -195,7 +194,7 @@ private fun SettingsDivider() {
             .fillMaxWidth()
             .height(0.5.dp)
             .padding(start = 52.dp)
-            .background(MochaOverlay1.copy(alpha = 0.15f)),
+            .background(SurfaceMedium.copy(alpha = 0.15f)),
     )
 }
 
@@ -224,10 +223,10 @@ private fun SettingsToggleRow(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MochaMauve,
+            tint = AccentSage,
             modifier = Modifier
                 .background(
-                    color = MochaMauve.copy(alpha = 0.1f),
+                    color = AccentSage.copy(alpha = 0.1f),
                     shape = RoundedCornerShape(10.dp),
                 )
                 .padding(8.dp),
@@ -239,13 +238,13 @@ private fun SettingsToggleRow(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge,
-                color = MochaText,
+                color = TextPrimary,
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
-                color = MochaSubtext0,
+                color = TextSecondary,
             )
         }
 
@@ -255,10 +254,10 @@ private fun SettingsToggleRow(
             checked = checked,
             onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
-                checkedThumbColor = MochaBase,
-                checkedTrackColor = MochaMauve,
-                uncheckedThumbColor = MochaSubtext0,
-                uncheckedTrackColor = MochaMantle,
+                checkedThumbColor = CanvasDark,
+                checkedTrackColor = AccentSage,
+                uncheckedThumbColor = TextSecondary,
+                uncheckedTrackColor = SurfaceDeep,
             ),
         )
     }
@@ -285,10 +284,10 @@ private fun SettingsStyleRow(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MochaMauve,
+                tint = AccentSage,
                 modifier = Modifier
                     .background(
-                        color = MochaMauve.copy(alpha = 0.1f),
+                        color = AccentSage.copy(alpha = 0.1f),
                         shape = RoundedCornerShape(10.dp),
                     )
                     .padding(8.dp),
@@ -298,13 +297,13 @@ private fun SettingsStyleRow(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MochaText,
+                    color = TextPrimary,
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MochaSubtext0,
+                    color = TextSecondary,
                 )
             }
         }
@@ -313,7 +312,7 @@ private fun SettingsStyleRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    color = MochaMantle,
+                    color = SurfaceDeep,
                     shape = RoundedCornerShape(14.dp)
                 )
                 .padding(4.dp),
@@ -324,13 +323,13 @@ private fun SettingsStyleRow(
 
             Text(
                 text = "Rule of Thirds",
-                color = if (isThirds) MochaBase else MochaSubtext0,
+                color = if (isThirds) CanvasDark else TextSecondary,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier
                     .weight(1f)
                     .background(
-                        color = if (isThirds) MochaMauve else androidx.compose.ui.graphics.Color.Transparent,
+                        color = if (isThirds) AccentSage else androidx.compose.ui.graphics.Color.Transparent,
                         shape = RoundedCornerShape(12.dp)
                     )
                     .clickable { onStyleChange(AppPreferences.STYLE_RULE_OF_THIRDS) }
@@ -339,13 +338,13 @@ private fun SettingsStyleRow(
             )
             Text(
                 text = "Golden Ratio",
-                color = if (isGolden) MochaBase else MochaSubtext0,
+                color = if (isGolden) CanvasDark else TextSecondary,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier
                     .weight(1f)
                     .background(
-                        color = if (isGolden) MochaMauve else androidx.compose.ui.graphics.Color.Transparent,
+                        color = if (isGolden) AccentSage else androidx.compose.ui.graphics.Color.Transparent,
                         shape = RoundedCornerShape(12.dp)
                     )
                     .clickable { onStyleChange(AppPreferences.STYLE_GOLDEN_RATIO) }

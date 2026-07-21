@@ -38,10 +38,28 @@ class AppPreferences(context: Context) {
 
         const val STYLE_RULE_OF_THIRDS = "rule_of_thirds"
         const val STYLE_GOLDEN_RATIO = "golden_ratio"
+        const val STYLE_CENTER_GRID = "center_grid"
+
+        const val KEY_SENSITIVITY = "sensitivity"
     }
 
     private val prefs: SharedPreferences =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+    // -------------------------------------------------------------------------
+    // Sensitivity Threshold
+    // -------------------------------------------------------------------------
+
+    private val _sensitivity = MutableStateFlow(prefs.getFloat(KEY_SENSITIVITY, 0.42f))
+
+    /** Sensitivity threshold for composition coach. */
+    val sensitivity: StateFlow<Float> = _sensitivity.asStateFlow()
+
+    /** Persist and publish a new [sensitivity] value. */
+    fun setSensitivity(value: Float) {
+        prefs.edit().putFloat(KEY_SENSITIVITY, value).apply()
+        _sensitivity.value = value
+    }
 
     // -------------------------------------------------------------------------
     // Grid overlay

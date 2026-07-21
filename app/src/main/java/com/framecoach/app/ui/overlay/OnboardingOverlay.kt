@@ -36,11 +36,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.framecoach.app.ui.theme.MochaBase
-import com.framecoach.app.ui.theme.MochaGreen
-import com.framecoach.app.ui.theme.MochaMauve
-import com.framecoach.app.ui.theme.MochaSubtext0
-import com.framecoach.app.ui.theme.MochaText
+import com.framecoach.app.ui.theme.CanvasDark
+import com.framecoach.app.ui.theme.SuccessIce
+import com.framecoach.app.ui.theme.AccentSage
+import com.framecoach.app.ui.theme.TextSecondary
+import com.framecoach.app.ui.theme.TextPrimary
 
 /**
  * First-launch onboarding overlay (B1).
@@ -71,7 +71,7 @@ fun OnboardingOverlay(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MochaBase.copy(alpha = 0.82f)),
+                .background(CanvasDark.copy(alpha = 0.82f)),
             contentAlignment = Alignment.Center,
         ) {
             Column(
@@ -85,7 +85,7 @@ fun OnboardingOverlay(
                     text = "How FrameCoach works",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = MochaText,
+                    color = TextPrimary,
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -93,7 +93,7 @@ fun OnboardingOverlay(
                 Text(
                     text = "Real-time composition guidance, 100% on device.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MochaSubtext0,
+                    color = TextSecondary,
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -128,8 +128,8 @@ fun OnboardingOverlay(
                     onClick = onDismiss,
                     shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MochaMauve,
-                        contentColor = MochaBase,
+                        containerColor = AccentSage,
+                        contentColor = CanvasDark,
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -173,13 +173,13 @@ private fun OnboardingTip(
         Box(
             modifier = Modifier
                 .size(44.dp)
-                .background(color = MochaMauve.copy(alpha = 0.15f), shape = CircleShape),
+                .background(color = AccentSage.copy(alpha = 0.15f), shape = CircleShape),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MochaMauve,
+                tint = AccentSage,
                 modifier = Modifier.size(22.dp),
             )
         }
@@ -192,13 +192,13 @@ private fun OnboardingTip(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold,
-                color = MochaText,
+                color = TextPrimary,
             )
             Spacer(modifier = Modifier.height(3.dp))
             Text(
                 text = body,
                 style = MaterialTheme.typography.bodySmall,
-                color = MochaSubtext0,
+                color = TextSecondary,
                 lineHeight = 18.sp,
             )
         }

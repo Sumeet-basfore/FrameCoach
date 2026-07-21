@@ -1,0 +1,254 @@
+<!DOCTYPE html><html lang="en" class="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Satoshi:wght@400;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#690005",
+                    "on-tertiary-fixed-variant": "#6b392b",
+                    "text-secondary": "#548173",
+                    "secondary-fixed": "#c3ebe1",
+                    "surface-bright": "#373a39",
+                    "secondary-fixed-dim": "#a7cfc5",
+                    "on-primary-fixed-variant": "#0e5048",
+                    "inverse-on-surface": "#2e3130",
+                    "on-tertiary-fixed": "#350f05",
+                    "warning-plum": "#30252A",
+                    "surface-variant": "#323534",
+                    "on-primary-container": "#00413a",
+                    "outline": "#899390",
+                    "surface-tint": "#97d2c7",
+                    "on-surface-variant": "#bfc9c5",
+                    "surface-deep": "#0E1715",
+                    "outline-variant": "#404946",
+                    "on-tertiary": "#502417",
+                    "on-secondary": "#103630",
+                    "surface-container-lowest": "#0c0f0e",
+                    "surface-dim": "#111413",
+                    "primary-container": "#73ada3",
+                    "surface-container-low": "#191c1b",
+                    "on-secondary-container": "#96bdb4",
+                    "on-tertiary-container": "#5a2c1f",
+                    "tertiary-fixed-dim": "#fdb5a2",
+                    "on-error-container": "#ffdad6",
+                    "on-primary-fixed": "#00201c",
+                    "on-secondary-fixed": "#00201b",
+                    "error": "#ffb4ab",
+                    "error-plum": "#29181D",
+                    "surface-container-high": "#272b2a",
+                    "surface": "#111413",
+                    "primary-fixed": "#b2eee3",
+                    "surface-container-highest": "#323534",
+                    "secondary-container": "#284d46",
+                    "text-primary": "#E6ECEB",
+                    "error-container": "#93000a",
+                    "on-primary": "#003731",
+                    "tertiary-fixed": "#ffdbd1",
+                    "on-background": "#e1e3e1",
+                    "on-surface": "#e1e3e1",
+                    "tertiary-container": "#d49280",
+                    "secondary": "#a7cfc5",
+                    "primary-fixed-dim": "#97d2c7",
+                    "primary": "#97d2c7",
+                    "tertiary": "#fdb5a2",
+                    "background": "#111413",
+                    "on-secondary-fixed-variant": "#284d46",
+                    "inverse-primary": "#2d685f",
+                    "surface-container": "#1d201f",
+                    "success-ice": "#9AC6BB",
+                    "canvas-dark": "#0D0A0B",
+                    "inverse-surface": "#e1e3e1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "1rem",
+                    "control-gap": "0.75rem",
+                    "safe-area-bottom": "2rem",
+                    "margin-mobile": "1.5rem"
+            },
+            "fontFamily": {
+                    "label-mono-sm": ["JetBrains Mono"],
+                    "headline-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-mono": ["JetBrains Mono"],
+                    "satoshi": ["Satoshi", "sans-serif"]
+            },
+            "fontSize": {
+                    "label-mono-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                    "body-lg": ["20px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-md": ["18px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-mono": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    }catch(_e){}</script><meta charset="utf-8"></head><body class="flex flex-col h-screen text-on-surface select-none font-satoshi">
+<!-- Top App Bar (From Shared Components) -->
+
+<!-- Main Viewport (Canvas) -->
+<main class="relative flex-grow w-full overflow-hidden">
+<!-- Live Camera Preview Placeholder -->
+<div class="absolute inset-0 z-0 bg-cover bg-center" data-alt="A cinematic, low-light photograph of a mysterious misty pine forest at dusk. The scene is dominated by deep obsidian blacks and dark spruce greens. A lone explorer stands in the mid-ground, silhouetted against the dim light. The atmosphere is professional and moody, perfectly suited for a high-end photography coaching application." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAqLmhf-DmomWPLQnD4WEFQyqG_BlFCtWfBx3HyM_8spxb-4v7ZfrqnKEvyhc_ojjwlDPdowPQSY839bc2CJq8__Fxjb8bDa3dsi83t_cHRVKxhDcnpj4PpFFBaVNgM4AU72O8tEzU88N05YWyvHfwsQffAc6V_E1qtpdwGRrn_0tQerQCWtLHBzNMTF1G3QnzDgwK_2eFfc1ISgRUH3JZ6aWpyBpYULWNy_cJbmccgVio5xhDUSU6DTGkQ5Q_ClGj493Ry9U6es-7o')"></div>
+<!-- 3x3 Grid Overlay -->
+<div class="absolute inset-0 z-10 pointer-events-none grid grid-cols-3 grid-rows-3">
+<div class="border-r border-b border-[#20453E]/40"></div>
+<div class="border-r border-b border-[#20453E]/40"></div>
+<div class="border-b border-[#20453E]/40"></div>
+<div class="border-r border-b border-[#20453E]/40"></div>
+<div class="border-r border-b border-[#20453E]/40"></div>
+<div class="border-b border-[#20453E]/40"></div>
+<div class="border-r border-[#20453E]/40"></div>
+<div class="border-r border-[#20453E]/40"></div>
+<div></div>
+</div>
+<!-- Horizon Level Indicator -->
+<div class="absolute top-24 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1">
+<div class="hud-glass px-3 py-1 rounded-full flex items-center gap-4">
+<div class="w-16 h-[1px] bg-outline-variant relative">
+<div class="absolute h-full bg-primary w-4 left-1/2 -translate-x-1/2 transition-transform duration-75" id="horizon-bar" style="transform: translateX(4px) rotate(1.2deg)"></div>
+</div>
+<span class="font-label-mono text-label-mono-sm text-primary tabular-nums" id="horizon-text">1.2°</span>
+</div>
+</div>
+<!-- Subject Bounding Box -->
+<div class="absolute top-1/3 left-1/4 w-32 h-48 z-20 pointer-events-none">
+<div class="relative w-full h-full border border-primary/20 backdrop-blur-[1px]">
+<div class="absolute w-4 h-4 corner-tl"></div>
+<div class="absolute w-4 h-4 corner-tr"></div>
+<div class="absolute w-4 h-4 corner-bl"></div>
+<div class="absolute w-4 h-4 corner-br"></div>
+<!-- Center Dot -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-primary rounded-full shadow-[0_0_8px_#73ADA3]"></div>
+<!-- Label -->
+<div class="absolute -top-6 left-0 bg-primary/20 backdrop-blur-md px-1.5 py-0.5 rounded-sm">
+<span class="font-label-mono text-[10px] uppercase text-primary">Subject Detected</span>
+</div>
+</div>
+</div>
+<!-- Composition Arrow -->
+<div class="absolute right-margin-mobile top-1/3 z-20 flex flex-col items-center animate-breath">
+<div class="text-primary-container">
+<span class="material-symbols-outlined text-[48px] rotate-[225deg]">arrow_right_alt</span>
+</div>
+<span class="font-label-mono text-label-mono-sm text-primary mt-1 shadow-sm">ALIGN TO THIRD</span>
+</div>
+<!-- Scan Line -->
+<div class="scan-line z-10"></div>
+</main>
+<!-- Bottom Controls & Navigation -->
+<section class="bg-surface-deep z-30 pb-safe-area-bottom px-margin-mobile pt-6 rounded-t-3xl shadow-2xl relative">
+<!-- Mode Selector -->
+<div class="flex justify-center mb-8">
+<div class="bg-surface-container-high rounded-full p-1 flex relative">
+<!-- Sliding Background (General Active) -->
+<div class="absolute top-1 left-1 bottom-1 w-[80px] bg-primary rounded-full transition-all duration-300" id="mode-pill"></div>
+<button class="relative z-10 w-20 py-2 text-label-mono-sm font-medium text-surface-deep transition-colors duration-300" onclick="setMode(0, this)">GENERAL</button>
+<button class="relative z-10 w-20 py-2 text-label-mono-sm font-medium text-on-surface-variant transition-colors duration-300" onclick="setMode(1, this)">PORTRAIT</button>
+<button class="relative z-10 w-20 py-2 text-label-mono-sm font-medium text-on-surface-variant transition-colors duration-300" onclick="setMode(2, this)">LANDSCAPE</button>
+</div>
+</div>
+<!-- Shutter Row -->
+<div class="flex items-center justify-between gap-gutter mb-6">
+<!-- Left Utility -->
+<button class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-container-highest active:scale-95 transition-all">
+<span class="material-symbols-outlined">vibration</span>
+</button>
+<!-- Main Shutter Button -->
+<div class="relative group cursor-pointer active:scale-95 transition-transform duration-150">
+<!-- Outer Ring -->
+<div class="w-20 h-20 rounded-full border-4 border-primary-container flex items-center justify-center">
+<!-- Shutter Core -->
+<div class="w-16 h-16 rounded-full bg-canvas-dark border border-outline-variant flex items-center justify-center overflow-hidden">
+<div class="w-14 h-14 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors"></div>
+</div>
+</div>
+</div>
+<!-- Right Utility -->
+<button class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-container-highest active:scale-95 transition-all">
+<span class="material-symbols-outlined">grid_4x4</span>
+</button>
+</div>
+<!-- Global Nav Anchor (From Shared Components) -->
+<nav class="flex justify-around items-center pt-2 pb-2">
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined">grid_view</span>
+</div>
+<div class="flex flex-col items-center justify-center text-primary scale-110 cursor-pointer">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">radio_button_checked</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined">history</span>
+</div>
+</nav>
+</section>
+<!-- UI Interaction Scripts -->
+<script>
+        function setMode(index, btn) {
+            const pill = document.getElementById('mode-pill');
+            const buttons = btn.parentElement.querySelectorAll('button');
+            
+            // Move pill
+            pill.style.left = (index * 80 + 4) + 'px';
+            
+            // Toggle text colors
+            buttons.forEach((b, i) => {
+                if(i === index) {
+                    b.classList.remove('text-on-surface-variant');
+                    b.classList.add('text-surface-deep');
+                } else {
+                    b.classList.remove('text-surface-deep');
+                    b.classList.add('text-on-surface-variant');
+                }
+            });
+        }
+
+        // Simple mock for accelerometer UI
+        let angle = 1.2;
+        let direction = 1;
+        setInterval(() => {
+            angle += (Math.random() * 0.2 * direction);
+            if (angle > 3) direction = -1;
+            if (angle < -3) direction = 1;
+            
+            const bar = document.getElementById('horizon-bar');
+            const text = document.getElementById('horizon-text');
+            if(bar && text) {
+                bar.style.transform = `translateX(${angle * 4}px) rotate(${angle}deg)`;
+                text.innerText = angle.toFixed(1) + '°';
+                
+                // Success state color feedback
+                if (Math.abs(angle) < 0.5) {
+                    bar.classList.replace('bg-primary', 'bg-success-ice');
+                    text.classList.replace('text-primary', 'text-success-ice');
+                } else {
+                    bar.classList.remove('bg-success-ice');
+                    bar.classList.add('bg-primary');
+                    text.classList.remove('text-success-ice');
+                    text.classList.add('text-primary');
+                }
+            }
+        }, 150);
+
+        // Haptic feedback simulation
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if ('vibrate' in navigator) {
+                    navigator.vibrate(10);
+                }
+            });
+        });
+    </script>
+
+</body></html>

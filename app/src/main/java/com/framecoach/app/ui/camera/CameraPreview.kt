@@ -62,6 +62,7 @@ fun CameraPreview(
     lifecycleOwner: LifecycleOwner,
     cameraMode: String,
     compositionStyle: String,
+    sensitivity: Float = 0.42f,
     modifier: Modifier = Modifier,
     onImageCaptureChanged: ((ImageCapture?) -> Unit)? = null,
     onCameraReady: ((Camera) -> Unit)? = null,
@@ -72,6 +73,7 @@ fun CameraPreview(
     // T11: remember the updated cameraMode to avoid capturing stale values in the analyzer callback
     val currentMode = rememberUpdatedState(cameraMode)
     val currentStyle = rememberUpdatedState(compositionStyle)
+    val currentSensitivity = rememberUpdatedState(sensitivity)
 
     // Coroutine scope with SupervisorJob — cancelled on dispose to drain in-flight work
     // before native resources are freed.
@@ -144,7 +146,7 @@ fun CameraPreview(
                             try {
                                 val boxes = frameProcessor.processFrame(imageProxy, currentMode.value)
                                 // MutableStateFlow.value is thread-safe; no Main dispatcher needed.
-                                CompositionState.update(boxes, currentStyle.value, currentMode.value)
+                                CompositionState.update(boxes, currentStyle.value, currentMode.value, currentSensitivity.value)
                             } catch (e: Exception) {
                                 // FrameProcessor.processFrame already closes the proxy in finally,
                                 // but guard against any early-exit path.

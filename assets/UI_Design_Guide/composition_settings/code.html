@@ -1,0 +1,233 @@
+<!DOCTYPE html><html lang="en" class="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#690005",
+                    "on-tertiary-fixed-variant": "#6b392b",
+                    "text-secondary": "#548173",
+                    "secondary-fixed": "#c3ebe1",
+                    "surface-bright": "#373a39",
+                    "secondary-fixed-dim": "#a7cfc5",
+                    "on-primary-fixed-variant": "#0e5048",
+                    "inverse-on-surface": "#2e3130",
+                    "on-tertiary-fixed": "#350f05",
+                    "warning-plum": "#30252A",
+                    "surface-variant": "#323534",
+                    "on-primary-container": "#00413a",
+                    "outline": "#899390",
+                    "surface-tint": "#97d2c7",
+                    "on-surface-variant": "#bfc9c5",
+                    "surface-deep": "#0E1715",
+                    "outline-variant": "#404946",
+                    "on-tertiary": "#502417",
+                    "on-secondary": "#103630",
+                    "surface-container-lowest": "#0c0f0e",
+                    "surface-dim": "#111413",
+                    "primary-container": "#73ada3",
+                    "surface-container-low": "#191c1b",
+                    "on-secondary-container": "#96bdb4",
+                    "on-tertiary-container": "#5a2c1f",
+                    "tertiary-fixed-dim": "#fdb5a2",
+                    "on-error-container": "#ffdad6",
+                    "on-primary-fixed": "#00201c",
+                    "on-secondary-fixed": "#00201b",
+                    "error": "#ffb4ab",
+                    "error-plum": "#29181D",
+                    "surface-container-high": "#272b2a",
+                    "surface": "#111413",
+                    "primary-fixed": "#b2eee3",
+                    "surface-container-highest": "#323534",
+                    "secondary-container": "#284d46",
+                    "text-primary": "#E6ECEB",
+                    "error-container": "#93000a",
+                    "on-primary": "#003731",
+                    "tertiary-fixed": "#ffdbd1",
+                    "on-background": "#e1e3e1",
+                    "on-surface": "#e1e3e1",
+                    "tertiary-container": "#d49280",
+                    "secondary": "#a7cfc5",
+                    "primary-fixed-dim": "#97d2c7",
+                    "primary": "#97d2c7",
+                    "tertiary": "#fdb5a2",
+                    "background": "#111413",
+                    "on-secondary-fixed-variant": "#284d46",
+                    "inverse-primary": "#2d685f",
+                    "surface-container": "#1d201f",
+                    "success-ice": "#9AC6BB",
+                    "canvas-dark": "#0D0A0B",
+                    "inverse-surface": "#e1e3e1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "24": "24px",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "1rem",
+                    "control-gap": "0.75rem",
+                    "safe-area-bottom": "2rem",
+                    "margin-mobile": "1.5rem"
+            },
+            "fontFamily": {
+                    "label-mono-sm": ["JetBrains Mono"],
+                    "headline-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-mono": ["JetBrains Mono"]
+            }
+          },
+        },
+      }
+    }catch(_e){}</script><meta charset="utf-8"></head><body class="text-on-background h-screen flex flex-col items-center justify-end overflow-hidden">
+<!-- Background Camera Viewfinder Mock -->
+<div class="fixed inset-0 z-0">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="A cinematic, low-light architectural photography shot with deep Spruce Black shadows and Eucalyptus Sage highlights. The image features sharp geometric lines of a modern concrete building under a starry night sky, reflecting a technical and professional photography atmosphere. Subtle lens flare and organic film grain are visible, maintaining the high-end cinematographer's aesthetic with a desaturated and earthy color palette." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDt0xN129HXWw-tkhqOwPYIrq3xbSbyYGwPRiS-kt1LFr-fkMvxuAFoiM9oi0n9QTtuNuUOCmq9i2CMA9xsig3QNeKRFlKayofJAdKJHrXEENe8p-fmH_xWTDbJHaJPCir51twnoBl9MIrr4HMAXaNquBljwsxSk8KbYAv2wlyljzxyytuvfjVvN3m5mVZ_okPq7T3pUx2rjju-VsdNVbKW-MqaXGFiakKlYF8535nRDh8kPe3egYC2JgoP3hzTq4uRA9hwsGBh4ieB')"></div>
+<!-- Viewfinder Overlays -->
+<div class="absolute inset-0 border-[20px] border-black/40 pointer-events-none"></div>
+<div class="grid-line w-full h-[1px] top-1/3"></div>
+<div class="grid-line w-full h-[1px] top-2/3"></div>
+<div class="grid-line h-full w-[1px] left-1/3"></div>
+<div class="grid-line h-full w-[1px] left-2/3"></div>
+<!-- HUD Elements -->
+<div class="absolute top-12 left-6 flex flex-col gap-1">
+<span class="font-label-mono text-label-mono-sm text-primary">ISO 400</span>
+<span class="font-label-mono text-label-mono-sm text-primary">1/60 F2.8</span>
+</div>
+<div class="absolute top-12 right-6">
+<div class="flex items-center gap-2 font-label-mono text-label-mono-sm text-error">
+<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+                REC 00:14:02
+            </div>
+</div>
+</div>
+<!-- Top App Bar (Shared Component Logic) -->
+
+<!-- Bottom Sheet Content Overlay -->
+<div class="fixed inset-0 bg-black/60 z-40"></div>
+<!-- Bottom Sheet Container -->
+<main class="relative z-50 w-full max-w-lg bg-surface-deep rounded-t-24 pb-safe-area-bottom shadow-2xl transform transition-transform duration-500 ease-out translate-y-0" id="settings-sheet">
+<!-- Handle -->
+<div class="flex justify-center pt-3 pb-5">
+<div class="w-12 h-1 bg-outline-variant rounded-full opacity-40"></div>
+</div>
+<div class="px-margin-mobile">
+<!-- Header -->
+<div class="flex justify-between items-center mb-6">
+<h2 class="font-headline-md text-headline-md text-text-primary">Composition Settings</h2>
+<button class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Settings List -->
+<div class="space-y-4">
+<!-- Toggle 1: Haptic -->
+<div class="flex items-center justify-between py-3 border-b border-warning-plum/30">
+<div>
+<p class="font-body-md text-text-primary">Haptic Feedback</p>
+<p class="text-[14px] text-text-secondary opacity-80">Vibrate when aligned</p>
+</div>
+<button class="relative w-12 h-6 rounded-full bg-primary-container p-1 transition-colors duration-200 flex items-center justify-end active-glow">
+<div class="w-4 h-4 rounded-full bg-on-primary shadow-sm"></div>
+</button>
+</div>
+<!-- Toggle 2: Voice Cues -->
+<div class="flex items-center justify-between py-3 border-b border-warning-plum/30">
+<div>
+<p class="font-body-md text-text-primary opacity-60">Voice Cues</p>
+<p class="text-[14px] text-text-secondary opacity-50">Speak direction updates</p>
+</div>
+<button class="relative w-12 h-6 rounded-full bg-surface-container-highest p-1 transition-colors duration-200 flex items-center justify-start opacity-60">
+<div class="w-4 h-4 rounded-full bg-on-surface-variant shadow-sm"></div>
+</button>
+</div>
+<!-- Segmented Control: Grid Pattern -->
+<div class="py-3">
+<p class="font-body-md text-text-primary mb-3">Grid Pattern</p>
+<div class="grid grid-cols-3 gap-2 bg-surface-container-low p-1 rounded-xl">
+<button class="py-2 text-[12px] font-medium rounded-lg bg-primary-container text-on-primary-container shadow-sm transition-all">Rule of Thirds</button>
+<button class="py-2 text-[12px] font-medium rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all">Golden Ratio</button>
+<button class="py-2 text-[12px] font-medium rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all">Center Grid</button>
+</div>
+</div>
+<!-- Slider: Sensitivity -->
+<div class="py-3">
+<div class="flex justify-between items-center mb-3">
+<p class="font-body-md text-text-primary">Sensitivity Threshold</p>
+<span class="font-label-mono text-label-mono-sm text-primary">0.42</span>
+</div>
+<div class="relative flex items-center">
+<input class="w-full h-1.5 bg-surface-container-highest rounded-lg appearance-none cursor-pointer slider-thumb" max="1" min="0" step="0.01" type="range" value="0.42">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 h-1.5 bg-primary-container rounded-lg pointer-events-none" style="width: 42%;"></div>
+</div>
+</div>
+</div>
+<!-- Footer Info -->
+<footer class="mt-8 mb-4 flex items-center justify-center gap-2 text-text-secondary">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+<p class="text-[12px] font-label-mono-sm leading-tight">Fully offline processing. No data leaves your device.</p>
+</footer>
+</div>
+</main>
+<!-- Bottom Nav Bar (Shared Component Logic) -->
+<nav class="fixed bottom-0 w-full z-[60] flex justify-around items-center px-margin-mobile pb-safe-area-bottom pt-4 bg-surface-deep/80 backdrop-blur-md rounded-t-xl md:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">radio_button_checked</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary scale-110" href="#">
+<span class="material-symbols-outlined">analytics</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">history</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for the slider
+        const slider = document.querySelector('input[type="range"]');
+        const fill = slider.nextElementSibling;
+        const valueDisplay = slider.parentElement.previousElementSibling.querySelector('span');
+
+        slider.addEventListener('input', (e) => {
+            const val = e.target.value;
+            fill.style.width = `${val * 100}%`;
+            valueDisplay.textContent = val;
+        });
+
+        // Toggle simulation
+        document.querySelectorAll('.relative.w-12').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const isOn = btn.classList.contains('bg-primary-container');
+                if(isOn) {
+                    btn.classList.remove('bg-primary-container', 'active-glow', 'justify-end');
+                    btn.classList.add('bg-surface-container-highest', 'justify-start');
+                    btn.querySelector('div').classList.replace('bg-on-primary', 'bg-on-surface-variant');
+                } else {
+                    btn.classList.remove('bg-surface-container-highest', 'justify-start');
+                    btn.classList.add('bg-primary-container', 'active-glow', 'justify-end');
+                    btn.querySelector('div').classList.replace('bg-on-surface-variant', 'bg-on-primary');
+                }
+            });
+        });
+
+        // Segmented Control simulation
+        document.querySelectorAll('.grid-cols-3 button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const parent = btn.parentElement;
+                parent.querySelectorAll('button').forEach(b => {
+                    b.classList.remove('bg-primary-container', 'text-on-primary-container', 'shadow-sm');
+                    b.classList.add('text-on-surface-variant');
+                });
+                btn.classList.add('bg-primary-container', 'text-on-primary-container', 'shadow-sm');
+                btn.classList.remove('text-on-surface-variant');
+            });
+        });
+    </script>
+
+</body></html>

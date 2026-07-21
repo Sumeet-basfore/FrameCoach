@@ -47,19 +47,12 @@ object CompositionRules {
     // Public API
     // -------------------------------------------------------------------------
 
-    /**
-     * Analyse a single detected object's [BoundingBox] and return a [CompositionSuggestion].
-     *
-     * @param box                The detected object's bounding box.
-     * @param style              Grid style ("rule_of_thirds" or "golden_ratio").
-     * @param mode               Camera mode ("general", "portrait", or "product").
-     * @param previousSuggestion Previous frame's suggestion (anti-oscillation).
-     */
     fun analyse(
         box: BoundingBox,
         style: String = "rule_of_thirds",
         mode: String = "general",
-        previousSuggestion: CompositionSuggestion? = null
+        previousSuggestion: CompositionSuggestion? = null,
+        sensitivity: Float = 0.42f
     ): CompositionSuggestion {
         val fillRatio = box.area
         val isProduct = mode == "product"
@@ -68,7 +61,8 @@ object CompositionRules {
         val peaks = if (isProduct) PRODUCT_PEAKS else GENERAL_PEAKS
         val nearestPeak = peaks.minByOrNull { (fillRatio - it) * (fillRatio - it) } ?: peaks.first()
         val distanceSq = (fillRatio - nearestPeak) * (fillRatio - nearestPeak)
-        val isSizeGood = distanceSq <= PEAK_TOLERANCE_SQ
+        val toleranceSq = 0.0025f * ((1.0f - sensitivity) / 0.58f).coerceIn(0f, 5f)
+        val isSizeGood = distanceSq <= toleranceSq
 
         var sizeDirection = if (isSizeGood) {
             Direction.NONE
@@ -93,7 +87,7 @@ object CompositionRules {
         val cy = box.centerY
 
         val (lowBound, highBound) = when {
-            isProduct -> CENTER_LOW to CENTER_HIGH
+            isProduct || style == "center_grid" -> CENTER_LOW to CENTER_HIGH
             style == "golden_ratio" -> PHI_LOW to PHI_HIGH
             else -> LEFT_THIRD to RIGHT_THIRD
         }

@@ -1,0 +1,189 @@
+<!DOCTYPE html><html lang="en" class="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#690005",
+                    "on-tertiary-fixed-variant": "#6b392b",
+                    "text-secondary": "#548173",
+                    "secondary-fixed": "#c3ebe1",
+                    "surface-bright": "#373a39",
+                    "secondary-fixed-dim": "#a7cfc5",
+                    "on-primary-fixed-variant": "#0e5048",
+                    "inverse-on-surface": "#2e3130",
+                    "on-tertiary-fixed": "#350f05",
+                    "warning-plum": "#30252A",
+                    "surface-variant": "#323534",
+                    "on-primary-container": "#00413a",
+                    "outline": "#899390",
+                    "surface-tint": "#97d2c7",
+                    "on-surface-variant": "#bfc9c5",
+                    "surface-deep": "#0E1715",
+                    "outline-variant": "#404946",
+                    "on-tertiary": "#502417",
+                    "on-secondary": "#103630",
+                    "surface-container-lowest": "#0c0f0e",
+                    "surface-dim": "#111413",
+                    "primary-container": "#73ada3",
+                    "surface-container-low": "#191c1b",
+                    "on-secondary-container": "#96bdb4",
+                    "on-tertiary-container": "#5a2c1f",
+                    "tertiary-fixed-dim": "#fdb5a2",
+                    "on-error-container": "#ffdad6",
+                    "on-primary-fixed": "#00201c",
+                    "on-secondary-fixed": "#00201b",
+                    "error": "#ffb4ab",
+                    "error-plum": "#29181D",
+                    "surface-container-high": "#272b2a",
+                    "surface": "#111413",
+                    "primary-fixed": "#b2eee3",
+                    "surface-container-highest": "#323534",
+                    "secondary-container": "#284d46",
+                    "text-primary": "#E6ECEB",
+                    "error-container": "#93000a",
+                    "on-primary": "#003731",
+                    "tertiary-fixed": "#ffdbd1",
+                    "on-background": "#e1e3e1",
+                    "on-surface": "#e1e3e1",
+                    "tertiary-container": "#d49280",
+                    "secondary": "#a7cfc5",
+                    "primary-fixed-dim": "#97d2c7",
+                    "primary": "#97d2c7",
+                    "tertiary": "#fdb5a2",
+                    "background": "#111413",
+                    "on-secondary-fixed-variant": "#284d46",
+                    "inverse-primary": "#2d685f",
+                    "surface-container": "#1d201f",
+                    "success-ice": "#9AC6BB",
+                    "canvas-dark": "#0D0A0B",
+                    "inverse-surface": "#e1e3e1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "1rem",
+                    "control-gap": "0.75rem",
+                    "safe-area-bottom": "2rem",
+                    "margin-mobile": "1.5rem"
+            },
+            "fontFamily": {
+                    "label-mono-sm": ["JetBrains Mono"],
+                    "headline-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-mono": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "label-mono-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                    "body-lg": ["20px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-md": ["18px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-mono": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    }catch(_e){}</script><meta charset="utf-8"></head><body class="h-screen w-full flex flex-col items-center justify-between overflow-hidden">
+<!-- Top AppBar (from JSON Guidance) -->
+
+<!-- Main Content Canvas -->
+<main class="relative w-full h-full flex flex-col items-center justify-center pt-16 pb-32 px-4">
+<!-- The Captured Image Container -->
+<div class="relative w-full max-w-md aspect-[3/4] bg-surface-deep rounded-lg overflow-hidden photo-frame group transition-all duration-700 ease-out transform scale-95 opacity-0" id="preview-image">
+<img class="w-full h-full object-cover" data-alt="A cinematic architectural photograph of a brutalist concrete building against a stormy, deep spruce green sky. The composition is a perfect rule-of-thirds alignment with sharp, high-contrast edges and dramatic low-key lighting. The overall mood is technical, professional, and slightly mysterious, following a dark forest-sage color palette with high fidelity details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChKLVY_06xKmU-a8tzFqsEmHcIpzItdfAuFmrAkOwlDL1o59z4g6SzyEnULgmVUz4-0hMNEhiDFLLNt-jS4f6g4Sak8UOrErLYCatkRi2q3PFSLSEr2Bb-rUVDUdgBCSPT6Exi3xU7HZpxVAYaelukLtgXz5EsA3zlMiIa3NL2lQYJtQXnffNX0MhgFpfXXZiMbpigKxe3QkWdyoJI3qCRAMVto5AAW01p-L3QfnKJJ6SYOI42NhytSSVuvqPMeOuFrh7l5oQnxaon">
+<div class="absolute inset-0 scanline-overlay opacity-30"></div>
+<!-- Floating Metadata HUD (Top Right) -->
+<div class="absolute top-4 right-4 z-20 flex flex-col gap-2 animate-in fade-in slide-in-from-right-4 duration-1000">
+<div class="glass-hud px-3 py-2 rounded-lg flex flex-col">
+<span class="font-label-mono-sm text-label-mono-sm text-primary opacity-60 uppercase tracking-tighter">Analysis</span>
+<div class="flex items-center justify-between gap-4 mt-1">
+<span class="font-label-mono text-label-mono text-text-primary">Score:</span>
+<span class="font-label-mono text-label-mono text-primary font-bold">94%</span>
+</div>
+<div class="flex items-center justify-between gap-4">
+<span class="font-label-mono text-label-mono text-text-primary">Composition:</span>
+<span class="font-label-mono text-label-mono text-text-primary">Thirds</span>
+</div>
+<div class="flex items-center justify-between gap-4">
+<span class="font-label-mono text-label-mono text-text-primary">Horizon:</span>
+<span class="font-label-mono text-label-mono text-success-ice">Level</span>
+</div>
+</div>
+</div>
+<!-- Overlay Guide (Subtle Grid) -->
+<div class="absolute inset-0 pointer-events-none grid grid-cols-3 grid-rows-3 opacity-20">
+<div class="border-r border-b border-outline-variant"></div>
+<div class="border-r border-b border-outline-variant"></div>
+<div class="border-b border-outline-variant"></div>
+<div class="border-r border-b border-outline-variant"></div>
+<div class="border-r border-b border-outline-variant"></div>
+<div class="border-b border-outline-variant"></div>
+<div class="border-r border-outline-variant"></div>
+<div class="border-r border-outline-variant"></div>
+<div></div>
+</div>
+</div>
+</main>
+<!-- Bottom Controls & Navigation -->
+<div class="fixed bottom-0 w-full z-50 bg-canvas-dark flex flex-col px-margin-mobile pb-safe-area-bottom pt-6 space-y-6">
+<!-- Action Buttons Horizontal Layout -->
+<div class="flex items-center justify-between w-full">
+<!-- Small Gallery Preview (Left) -->
+<div class="w-12 h-12 rounded-lg overflow-hidden photo-frame flex-shrink-0 active:scale-90 transition-transform">
+<img class="w-full h-full object-cover" data-alt="A tiny, high-contrast gallery thumbnail of a previous architectural shot showing a circular skylight. The style is ultra-modern, monochrome with hints of deep spruce, matching the professional camera hardware aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpL_qvtu0FskCCdqPEpOYYrb-O4u3qq_mL0r-bpBNuJ-K7j-LJ1Dc7ucmzrmBpbVuL3Ymmmys3F8N_yfSyqCBSe4jZq9Llx-nKvJEdz3LoVJa2V4KY30MG-JNSsvUhmgXLwassuSvGNe0iaCrDYvCQxFtVdeOEKuiWJZ63sHh2soT2pYyZ71HREi_FRv8awFsG4kBdu3MXpzD2vV7-QKGgMCIu2q8_7bMc-rOkHZg-fdnfplB13QnN9ULARCoNuJgRUi4y_F6FjmK2">
+</div>
+<!-- Main-->
+<div class="flex items-center gap-control-gap">
+<button class="px-8 py-3 rounded-full border border-text-primary text-text-primary font-label-mono text-label-mono active:scale-95 transition-all">
+                    Retake
+                </button>
+<button class="px-10 py-3 rounded-full bg-primary-container text-canvas-dark font-label-mono text-label-mono font-bold active:scale-95 transition-all shadow-[0_0_20px_rgba(115,173,163,0.3)]">
+                    Keep Photo
+                </button>
+</div>
+</div>
+<!-- Secondary Meta/Navigation Icons (Bottom Bar Placeholder) -->
+<nav class="flex justify-around items-center pt-2 opacity-60">
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">grid_view</span>
+</div>
+<div class="flex flex-col items-center justify-center text-primary scale-110">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">radio_button_checked</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">history</span>
+</div>
+</nav>
+</div>
+<script>
+        // Micro-interactions for cinematic entrance
+        window.addEventListener('DOMContentLoaded', () => {
+            const preview = document.getElementById('preview-image');
+            setTimeout(() => {
+                preview.classList.remove('scale-95', 'opacity-0');
+                preview.classList.add('scale-100', 'opacity-100');
+            }, 300);
+        });
+
+        // Basic button interactions
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const ripple = document.createElement('div');
+                ripple.classList.add('ripple');
+                btn.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+    </script>
+
+</body></html>

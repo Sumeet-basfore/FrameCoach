@@ -5,47 +5,44 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 
 /**
- * Frame (Catppuccin Mocha) Material 3 color scheme.
+ * Organic HUD Material 3 color scheme.
  *
- * Dark-first by design: a light theme would be distracting around a camera viewfinder
- * (04_Frontend_Specification_Document.md §1). We hard-code [darkColorScheme] rather than
- * deferring to [isSystemInDarkTheme] because switching to light mode would break the
- * intended look — even on a device that defaults to light theming, Frame stays dark.
+ * Dark-first, low-glare dark theme tailored for camera coaching overlays (C1/C2).
  */
 private val FrameDarkColorScheme = darkColorScheme(
-    primary = MochaMauve,
-    onPrimary = MochaBase,
-    primaryContainer = MochaMauve.copy(alpha = 0.12f),
-    onPrimaryContainer = MochaMauve,
+    primary = AccentSage,
+    onPrimary = SurfaceDeep,
+    primaryContainer = AccentSage.copy(alpha = 0.12f),
+    onPrimaryContainer = AccentSage,
 
-    secondary = MochaGreen,
-    onSecondary = MochaBase,
-    secondaryContainer = MochaGreen.copy(alpha = 0.12f),
-    onSecondaryContainer = MochaGreen,
+    secondary = SuccessIce,
+    onSecondary = SurfaceDeep,
+    secondaryContainer = SuccessIce.copy(alpha = 0.12f),
+    onSecondaryContainer = SuccessIce,
 
-    tertiary = MochaPeach,
-    onTertiary = MochaBase,
-    tertiaryContainer = MochaPeach.copy(alpha = 0.12f),
-    onTertiaryContainer = MochaPeach,
+    tertiary = WarningPlum,
+    onTertiary = TextPrimary,
+    tertiaryContainer = WarningPlum.copy(alpha = 0.12f),
+    onTertiaryContainer = TextPrimary,
 
-    background = MochaBase,
-    onBackground = MochaText,
-    surface = MochaMantle,
-    onSurface = MochaText,
-    surfaceVariant = MochaMantle,
-    onSurfaceVariant = MochaSubtext0,
+    background = CanvasDark,
+    onBackground = TextPrimary,
+    surface = SurfaceDeep,
+    onSurface = TextPrimary,
+    surfaceVariant = SurfaceMedium,
+    onSurfaceVariant = TextSecondary,
 
-    error = MochaRed,
-    onError = MochaBase,
-    errorContainer = MochaRed.copy(alpha = 0.12f),
-    onErrorContainer = MochaRed,
+    error = ErrorPlum,
+    onError = TextPrimary,
+    errorContainer = ErrorPlum.copy(alpha = 0.12f),
+    onErrorContainer = ErrorPlum,
 
-    outline = MochaOverlay1,
-    outlineVariant = MochaOverlay1.copy(alpha = 0.40f),
+    outline = SurfaceMedium,
+    outlineVariant = SurfaceMedium.copy(alpha = 0.40f),
 )
 
 /**
- * Frame app theme — wraps [MaterialTheme] with the Catppuccin Mocha colour scheme.
+ * Frame app theme — wraps [MaterialTheme] with the Organic HUD colour scheme.
  *
  * Call this at the root of the Compose tree (in [MainActivity.setContent]).
  */

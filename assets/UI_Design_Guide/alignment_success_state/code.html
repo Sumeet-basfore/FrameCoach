@@ -1,0 +1,219 @@
+<!DOCTYPE html><html lang="en" class="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#690005",
+                    "on-tertiary-fixed-variant": "#6b392b",
+                    "text-secondary": "#548173",
+                    "secondary-fixed": "#c3ebe1",
+                    "surface-bright": "#373a39",
+                    "secondary-fixed-dim": "#a7cfc5",
+                    "on-primary-fixed-variant": "#0e5048",
+                    "inverse-on-surface": "#2e3130",
+                    "on-tertiary-fixed": "#350f05",
+                    "warning-plum": "#30252A",
+                    "surface-variant": "#323534",
+                    "on-primary-container": "#00413a",
+                    "outline": "#899390",
+                    "surface-tint": "#97d2c7",
+                    "on-surface-variant": "#bfc9c5",
+                    "surface-deep": "#0E1715",
+                    "outline-variant": "#404946",
+                    "on-tertiary": "#502417",
+                    "on-secondary": "#103630",
+                    "surface-container-lowest": "#0c0f0e",
+                    "surface-dim": "#111413",
+                    "primary-container": "#73ada3",
+                    "surface-container-low": "#191c1b",
+                    "on-secondary-container": "#96bdb4",
+                    "on-tertiary-container": "#5a2c1f",
+                    "tertiary-fixed-dim": "#fdb5a2",
+                    "on-error-container": "#ffdad6",
+                    "on-primary-fixed": "#00201c",
+                    "on-secondary-fixed": "#00201b",
+                    "error": "#ffb4ab",
+                    "error-plum": "#29181D",
+                    "surface-container-high": "#272b2a",
+                    "surface": "#111413",
+                    "primary-fixed": "#b2eee3",
+                    "surface-container-highest": "#323534",
+                    "secondary-container": "#284d46",
+                    "text-primary": "#E6ECEB",
+                    "error-container": "#93000a",
+                    "on-primary": "#003731",
+                    "tertiary-fixed": "#ffdbd1",
+                    "on-background": "#e1e3e1",
+                    "on-surface": "#e1e3e1",
+                    "tertiary-container": "#d49280",
+                    "secondary": "#a7cfc5",
+                    "primary-fixed-dim": "#97d2c7",
+                    "primary": "#97d2c7",
+                    "tertiary": "#fdb5a2",
+                    "background": "#111413",
+                    "on-secondary-fixed-variant": "#284d46",
+                    "inverse-primary": "#2d685f",
+                    "surface-container": "#1d201f",
+                    "success-ice": "#9AC6BB",
+                    "canvas-dark": "#0D0A0B",
+                    "inverse-surface": "#e1e3e1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "1rem",
+                    "control-gap": "0.75rem",
+                    "safe-area-bottom": "2rem",
+                    "margin-mobile": "1.5rem"
+            },
+            "fontFamily": {
+                    "label-mono-sm": ["JetBrains Mono"],
+                    "headline-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-mono": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "label-mono-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                    "body-lg": ["20px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-md": ["18px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-mono": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    }catch(_e){}</script><meta charset="utf-8"></head><body class="dark bg-canvas-dark">
+<div class="flex flex-col overflow-hidden" id="app-shell">
+<!-- Viewfinder Background -->
+<div class="absolute inset-0 z-0">
+<div class="w-full h-full bg-cover bg-center opacity-90" data-alt="A professional cinematic portrait shot of a human subject positioned according to the rule of thirds in a modern architectural setting with deep spruce shadows and eucalyptus accents. The lighting is moody and focused, with soft natural highlights emphasizing the textures of the stone walls and the subject's features. The scene is captured with a shallow depth of field, creating a high-end photography aesthetic consistent with FrameCoach's organic dark theme and technical precision." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC3QyhUvm-6I8OicYOXZ7DLMChP4c4T1UIA0EpikQ1Bsk8XJu5ZzTwGwsy1N8HEZ1PNepmzBHqfANXwYZ-k2T2vXolKdF0ovgqrdHxgChfpgVjaUHtxWqB0sto1zOYbIFtjqecNIzfC5Ld2ADKFljzWAiVTdPJNMk6TJdjqR0TDA59c0y8F8YGIyIZ0BA_7uXjDvreEYaERxsLZzgx_nSofuhPPoY2cGWOqkrdlUEzkWKiLtj0dK-9K-ZYI4I6tdnScIKKJlBR6cnHw')">
+</div>
+</div>
+<!-- 3x3 Composition Grid (Success State: Ice Eucalyptus) -->
+<div class="absolute inset-0 z-10 pointer-events-none px-4 py-32">
+<div class="w-full h-full grid grid-cols-3 grid-rows-3">
+<div class="border-r border-b border-success-ice/80"></div>
+<div class="border-r border-b border-success-ice/80 relative">
+<!-- Central Lock Target Icon -->
+<div class="absolute -bottom-3 -right-3 w-6 h-6 flex items-center justify-center text-success-ice animate-pulse">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">radio_button_checked</span>
+</div>
+</div>
+<div class="border-b border-success-ice/80"></div>
+<div class="border-r border-b border-success-ice/80 relative">
+<!-- Bounding Box Glow -->
+<div class="absolute top-1/2 left-1/4 w-32 h-48 border-2 border-success-ice rounded-lg shadow-[0_0_20px_rgba(154,198,187,0.4)] transition-all duration-500"></div>
+</div>
+<div class="border-r border-b border-success-ice/80"></div>
+<div class="border-b border-success-ice/80"></div>
+<div class="border-r border-success-ice/80"></div>
+<div class="border-r border-success-ice/80"></div>
+<div class=""></div>
+</div>
+</div>
+<!-- Horizon Level Indicator -->
+<div class="absolute inset-x-0 top-1/2 -translate-y-1/2 z-20 flex justify-between items-center px-6 pointer-events-none">
+<div class="w-12 h-[2px] bg-success-ice shadow-[0_0_8px_rgba(154,198,187,0.8)]"></div>
+<div class="w-12 h-[2px] bg-success-ice shadow-[0_0_8px_rgba(154,198,187,0.8)]"></div>
+</div>
+<!-- Top App Bar (Shared Component Strategy) -->
+
+<!-- Technical Overlays (HUD Data) -->
+<div class="absolute top-24 inset-x-gutter flex justify-between z-20 pointer-events-none">
+<div class="flex flex-col gap-1">
+<span class="font-label-mono text-label-mono-sm text-success-ice/80">ISO 400</span>
+<span class="font-label-mono text-label-mono-sm text-success-ice/80">1/125s</span>
+</div>
+<div class="flex flex-col gap-1 items-end">
+<span class="font-label-mono text-label-mono-sm text-success-ice/80">RAW 12-BIT</span>
+<span class="font-label-mono text-label-mono-sm text-success-ice/80">4K 60FPS</span>
+</div>
+</div>
+<!-- Main Interaction Area (Bottom Control Panel) -->
+<div class="mt-auto z-30 pb-safe-area-bottom">
+<!-- Exposure/Zoom Scrubber -->
+<div class="px-gutter mb-6">
+<div class="relative h-12 flex items-center justify-center">
+<div class="absolute w-full h-[1px] bg-outline-variant/30"></div>
+<div class="flex gap-4 items-center overflow-hidden">
+<div class="w-0.5 h-4 bg-outline-variant/40"></div>
+<div class="w-0.5 h-6 bg-outline-variant/40"></div>
+<div class="w-0.5 h-4 bg-outline-variant/40"></div>
+<div class="w-1 h-8 bg-success-ice rounded-full"></div>
+<div class="w-0.5 h-4 bg-outline-variant/40"></div>
+<div class="w-0.5 h-6 bg-outline-variant/40"></div>
+<div class="w-0.5 h-4 bg-outline-variant/40"></div>
+</div>
+<div class="absolute bottom-0 font-label-mono text-[10px] text-on-surface-variant uppercase tracking-widest">Exposure EV +0.0</div>
+</div>
+</div>
+<!-- Primary Camera Controls Shell -->
+<div class="bg-surface-deep/90 hud-blur pt-8 pb-10 px-gutter rounded-t-[32px] flex flex-col gap-8">
+<!-- Quick Modes -->
+<div class="flex justify-between items-center px-4">
+<button class="font-label-mono text-label-mono-sm text-on-surface-variant">PHOTO</button>
+<button class="font-label-mono text-label-mono-sm text-success-ice border-b border-success-ice">VIDEO</button>
+<button class="font-label-mono text-label-mono-sm text-on-surface-variant">CINEMATIC</button>
+<button class="font-label-mono text-label-mono-sm text-on-surface-variant">PRO</button>
+</div>
+<!-- Capture Section -->
+<div class="flex justify-between items-center px-4">
+<!-- Gallery Preview -->
+<div class="w-12 h-12 rounded-lg border border-outline-variant/30 overflow-hidden">
+<div class="w-full h-full bg-cover" data-alt="A small thumbnail preview of a previous photograph showing a cinematic urban landscape with teal and orange highlights, consistent with the app's visual identity." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCvb7dYSQt5qxwhQTxSdnYOApSCwqPflR4S2Ut1-HNW459i3_sZAdw3MQ0kMVHe4auvfBmklWF4mMxdL7I9Nl3jIFEm81MCZb4z2HmvKcI1UtbY7snlVjtQ3QTLPZTdgAPjlS_g1tQLS6YlGZ-2xR00BJ8u6H9fple29pl_Ut-sbuCJgCtuqGyAivPdFxN8YG0e8lCrRNtTWoda1QBIhUK6oZGlMb_TsTSg4mKGodTqXO4y-hkswTy03-eYp0HpUnp8WLwXO49sbypf')"></div>
+</div>
+<!-- Main Shutter -->
+<button class="relative flex items-center justify-center w-20 h-20 group">
+<div class="shutter-ring absolute inset-0 rounded-full transition-transform duration-200 group-active:scale-90"></div>
+<div class="shutter-inner w-14 h-14 bg-success-ice rounded-full transition-all duration-300 group-active:scale-95 flex items-center justify-center">
+<!-- Success indicator inside shutter -->
+<span class="material-symbols-outlined text-surface-deep text-2xl" style="font-variation-settings: 'FILL' 1;">videocam</span>
+</div>
+</button>
+<!-- Camera Flip -->
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-variant/40 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="sync">sync</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar (Shared Component Strategy) -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-margin-mobile pb-safe-area-bottom pt-4 bg-surface-deep/80 backdrop-blur-md rounded-t-xl">
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+</div>
+<div class="flex flex-col items-center justify-center text-primary scale-110">
+<span class="material-symbols-outlined" data-icon="radio_button_checked">radio_button_checked</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</div>
+</nav>
+</div>
+<script>
+        // Micro-interaction: Subtle vibration/feedback simulation on success state
+        document.addEventListener('DOMContentLoaded', () => {
+            const shutter = document.querySelector('.shutter-inner');
+            shutter.addEventListener('click', () => {
+                // Flash effect
+                const overlay = document.createElement('div');
+                overlay.className = 'fixed inset-0 bg-white z-[100] pointer-events-none opacity-20 transition-opacity duration-300';
+                document.body.appendChild(overlay);
+                setTimeout(() => overlay.style.opacity = '0', 50);
+                setTimeout(() => overlay.remove(), 350);
+            });
+        });
+    </script>
+
+</body></html>

@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.framecoach.app.ui.theme.MochaMauve
+import com.framecoach.app.ui.theme.AccentSage
 
 /**
  * Full-screen explanation shown when [CameraPermissionState] is [Denied] or [PermanentlyDenied].
@@ -80,7 +80,7 @@ fun PermissionDeniedScreen(
                     context.startActivity(intent)
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MochaMauve,
+                    containerColor = AccentSage,
                 ),
             ) {
                 Text("Open app settings")
@@ -89,7 +89,7 @@ fun PermissionDeniedScreen(
             Button(
                 onClick = onRequestPermission,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MochaMauve,
+                    containerColor = AccentSage,
                 ),
             ) {
                 Text("Grant camera access")

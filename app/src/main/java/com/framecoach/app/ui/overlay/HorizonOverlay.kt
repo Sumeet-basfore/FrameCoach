@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.unit.dp
 import com.framecoach.app.sensors.HorizonLevelCalculator
 import com.framecoach.app.sensors.HorizonSensor
-import com.framecoach.app.ui.theme.MochaYellow
+import com.framecoach.app.ui.theme.AccentSage
 
 /**
  * Canvas overlay that draws a horizon level indicator (T9).
@@ -75,8 +75,8 @@ private fun DrawScope.drawHorizonIndicator(
     val tickHeight = 10.dp.toPx()
     val bubbleRadius = 6.dp.toPx()
 
-    // Colour: yellow while off-level (matches spec §1 "Warning" colour).
-    val lineColor: Color = MochaYellow
+    // Colour: Eucalyptus Sage while off-level.
+    val lineColor: Color = AccentSage
 
     // Rotate the entire drawing around the canvas centre by the roll angle.
     rotate(degrees = rollDeg, pivot = Offset(cx, cy)) {
