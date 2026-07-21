@@ -72,7 +72,14 @@ class FaceDetectorHelper(private val context: Context) {
             ?: return@withLock emptyList()
 
         val result: FaceDetectorResult? = synchronized(closeLock) {
-            if (isClosed) null else detector.detect(mpImage)
+            if (isClosed) null else {
+                try {
+                    detector.detect(mpImage)
+                } catch (e: Exception) {
+                    Log.e(TAG, "MediaPipe face detection failed", e)
+                    null
+                }
+            }
         }
         if (result == null) return@withLock emptyList()
 

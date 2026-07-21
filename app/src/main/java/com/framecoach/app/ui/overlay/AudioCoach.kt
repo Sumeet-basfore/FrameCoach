@@ -40,15 +40,24 @@ class AudioCoach(private val context: Context) {
      */
     fun init(onReady: () -> Unit = {}) {
         if (ttsReady) return
-        tts = TextToSpeech(context) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                tts?.language = Locale.getDefault()
-                ttsReady = true
-                Log.d(TAG, "TTS engine ready")
-                onReady()
-            } else {
-                Log.w(TAG, "TTS initialisation failed with status: $status")
+        try {
+            tts = TextToSpeech(context) { status ->
+                if (status == TextToSpeech.SUCCESS) {
+                    try {
+                        tts?.language = Locale.getDefault()
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Failed to set default TTS language", e)
+                    }
+                    ttsReady = true
+                    Log.d(TAG, "TTS engine ready")
+                    onReady()
+                } else {
+                    Log.w(TAG, "TTS initialisation failed with status: $status")
+                }
             }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to create TextToSpeech instance", e)
+            ttsReady = false
         }
     }
 
@@ -65,8 +74,12 @@ class AudioCoach(private val context: Context) {
         if (direction == lastSpokenDirection) return          // same direction — suppress
         lastSpokenDirection = direction
         val cue = directionCue(direction)
-        tts?.speak(cue, TextToSpeech.QUEUE_FLUSH, null, direction.name)
-        Log.d(TAG, "TTS spoke: \"$cue\"")
+        try {
+            tts?.speak(cue, TextToSpeech.QUEUE_FLUSH, null, direction.name)
+            Log.d(TAG, "TTS spoke: \"$cue\"")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to speak TTS cue", e)
+        }
     }
 
     /**

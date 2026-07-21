@@ -22,3 +22,17 @@
 -dontwarn javax.lang.model.type.TypeMirror
 -dontwarn javax.lang.model.type.TypeVisitor
 -dontwarn javax.lang.model.util.SimpleTypeVisitor8
+
+# TensorFlow Lite native & Java interfaces
+-keep class org.tensorflow.lite.** { *; }
+-keep class com.google.android.gms.tflite.** { *; }
+
+# Room Database entities & DAOs
+-keep class androidx.room.** { *; }
+-keep class com.framecoach.app.data.db.** { *; }
+
+# Application model & logic classes (prevents R8 obfuscation/stripping of reflection/StateFlow models)
+-keep class com.framecoach.app.detection.** { *; }
+-keep class com.framecoach.app.rules.** { *; }
+-keep class com.framecoach.app.sensors.** { *; }
+-keep class com.framecoach.app.ui.** { *; }
