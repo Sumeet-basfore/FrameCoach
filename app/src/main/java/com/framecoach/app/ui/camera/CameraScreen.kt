@@ -68,6 +68,7 @@ import com.framecoach.app.ui.overlay.HorizonOverlay
 import com.framecoach.app.ui.overlay.OnboardingOverlay
 import com.framecoach.app.ui.settings.AppPreferences
 import com.framecoach.app.sensors.HorizonSensor
+import com.framecoach.app.data.db.ShotHistoryRepository
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.camera.core.ImageCapture
@@ -164,6 +165,9 @@ fun CameraScreen(
         onDispose { horizonSensor.stop() }
     }
 
+    // C2: Shot history repository — local Room DB for offline capture log.
+    val shotHistoryRepo = remember(context) { ShotHistoryRepository.getInstance(context) }
+
     val requestPermissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -234,9 +238,22 @@ fun CameraScreen(
                 }
 
                 override fun onImageSaved(output: androidx.camera.core.ImageCapture.OutputFileResults) {
+                    val savedUriString = output.savedUri?.toString() ?: ""
                     val msg = "Photo saved: ${output.savedUri}"
                     Log.d("CameraScreen", msg)
                     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+
+                    // C2: record shot in local Room history DB
+                    val currentSuggestion = CompositionState.suggestion.value
+                    scope.launch {
+                        shotHistoryRepo.recordShot(
+                            imageUri = savedUriString,
+                            mode = cameraMode,
+                            isGoodZone = currentSuggestion.isGood,
+                            suggestion = currentSuggestion.direction.displayText,
+                            compositionStyle = compositionStyle,
+                        )
+                    }
                 }
             }
         )

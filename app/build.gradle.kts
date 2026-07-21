@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 // Load signing credentials from local.properties (never commit this file).
@@ -110,6 +111,11 @@ dependencies {
     // MediaPipe Tasks Vision + Core — EfficientDet-Lite0 object detection (T3)
     implementation(libs.mediapipe.tasks.vision)
     implementation(libs.mediapipe.tasks.core)
+
+    // Room database — C2 Local Shot History Log
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
     testImplementation("junit:junit:4.13.2")
 }
