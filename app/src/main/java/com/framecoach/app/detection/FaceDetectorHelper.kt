@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.RectF
 import android.util.Log
 import androidx.camera.core.ImageProxy
-import com.google.mediapipe.framework.image.ByteBufferImageBuilder
+import com.google.mediapipe.framework.image.BitmapImageBuilder
 import com.google.mediapipe.framework.image.MPImage
 import com.google.mediapipe.tasks.core.BaseOptions
 import com.google.mediapipe.tasks.vision.core.RunningMode
@@ -129,64 +129,8 @@ class FaceDetectorHelper(private val context: Context) {
 
     private fun imageProxyToMPImage(imageProxy: ImageProxy): MPImage? {
         return try {
-            val planes = imageProxy.planes
-            if (planes.size != 3) {
-                Log.w(TAG, "Unexpected number of planes: ${planes.size}")
-                return null
-            }
-
-            val yBuffer = planes[0].buffer
-            val uBuffer = planes[1].buffer
-            val vBuffer = planes[2].buffer
-
-            val yPixelStride = planes[0].pixelStride ?: 1
-            val yRowStride = planes[0].rowStride
-            val uPixelStride = planes[1].pixelStride ?: 1
-            val uRowStride = planes[1].rowStride
-            val vPixelStride = planes[2].pixelStride ?: 1
-            val vRowStride = planes[2].rowStride
-
-            val width = imageProxy.width
-            val height = imageProxy.height
-
-            val uvWidth = (width + 1) / 2
-            val uvHeight = (height + 1) / 2
-            val nv21Size = width * height + uvWidth * uvHeight * 2
-
-            val nv21Buffer = java.nio.ByteBuffer.allocateDirect(nv21Size)
-            nv21Buffer.order(java.nio.ByteOrder.nativeOrder())
-
-            for (row in 0 until height) {
-                val srcPos = row * yRowStride
-                yBuffer.position(srcPos)
-                if (yPixelStride == 1 && yRowStride == width) {
-                    val chunk = ByteArray(width)
-                    yBuffer.get(chunk)
-                    nv21Buffer.put(chunk)
-                } else {
-                    for (col in 0 until width) {
-                        yBuffer.position(srcPos + col * yPixelStride)
-                        nv21Buffer.put(yBuffer.get())
-                    }
-                }
-            }
-
-            for (row in 0 until uvHeight) {
-                for (col in 0 until uvWidth) {
-                    val uPos = row * uRowStride + col * uPixelStride
-                    val vPos = row * vRowStride + col * vPixelStride
-                    uBuffer.position(uPos)
-                    vBuffer.position(vPos)
-                    nv21Buffer.put(vBuffer.get())
-                    nv21Buffer.put(uBuffer.get())
-                }
-            }
-
-            nv21Buffer.rewind()
-
-            return ByteBufferImageBuilder(nv21Buffer, width, height, MPImage.IMAGE_FORMAT_NV21)
-                .build()
-
+            val bitmap = imageProxy.toBitmap()
+            BitmapImageBuilder(bitmap).build()
         } catch (e: Exception) {
             Log.e(TAG, "Failed to convert ImageProxy to MPImage", e)
             null

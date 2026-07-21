@@ -1,17 +1,26 @@
 package com.framecoach.app
 
 import android.app.Application
+import android.util.Log
+import java.io.File
 
 /**
- * Minimal Application class for the Frame composition-coach app.
- *
- * No DI or heavy initialization needed in v1 per 02_Technical_Architecture_Document.md §2;
- * the architecture doc defers Hilt to when there's more than one screen. If lifecycle-aware
- * initialization becomes necessary (e.g. pref-warming MediaPipe in T3), add it here.
+ * Application class for the Frame composition-coach app with global crash logging.
  */
 class FrameApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        // No-op in v1 — reserved for future initialization.
+        
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            try {
+                Log.e("FrameApplication", "UNCAUGHT CRASH in thread ${thread.name}", throwable)
+                val crashFile = File(getExternalFilesDir(null) ?: filesDir, "crash_log.txt")
+                crashFile.writeText("Crash in thread ${thread.name}:\n" + Log.getStackTraceString(throwable))
+            } catch (e: Exception) {
+                Log.e("FrameApplication", "Failed to write crash log to disk", e)
+            }
+            defaultHandler?.uncaughtException(thread, throwable)
+        }
     }
 }
