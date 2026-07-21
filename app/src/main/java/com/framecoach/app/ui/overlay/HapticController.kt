@@ -31,12 +31,17 @@ class HapticController(context: Context) {
         private const val LEGACY_VIBRATE_MS = 30L
     }
 
-    private val vibrator: Vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        val manager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-        manager.defaultVibrator
-    } else {
-        @Suppress("DEPRECATION")
-        context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    private val vibrator: Vibrator? = try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val manager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
+            manager?.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+        }
+    } catch (e: Exception) {
+        Log.w(TAG, "Failed to obtain Vibrator service", e)
+        null
     }
 
     private val edgeDetector = GoodZoneEdgeDetector()
@@ -50,17 +55,20 @@ class HapticController(context: Context) {
     fun onCompositionUpdate(isGood: Boolean) {
         if (!edgeDetector.onUpdate(isGood)) return
 
-        Log.d(TAG, "Good zone entered — firing haptic pulse")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            // API 29+: use a predefined effect for a crisp, system-tuned click.
-            vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // API 26–28: VibrationEffect available but no predefined effects.
-            vibrator.vibrate(VibrationEffect.createOneShot(LEGACY_VIBRATE_MS, VibrationEffect.DEFAULT_AMPLITUDE))
-        } else {
-            // API 24–25: legacy API.
-            @Suppress("DEPRECATION")
-            vibrator.vibrate(LEGACY_VIBRATE_MS)
+        val v = vibrator ?: return
+        try {
+            if (!v.hasVibrator()) return
+            Log.d(TAG, "Good zone entered — firing haptic pulse")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                v.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                v.vibrate(VibrationEffect.createOneShot(LEGACY_VIBRATE_MS, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                @Suppress("DEPRECATION")
+                v.vibrate(LEGACY_VIBRATE_MS)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Haptic pulse failed", e)
         }
     }
 
