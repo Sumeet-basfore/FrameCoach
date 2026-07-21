@@ -390,7 +390,10 @@ fun CameraScreen(
                     if (exposureResult.isWarning) {
                         val label = when {
                             exposureResult.isUnderexposed -> "UNDEREXPOSED"
-                            else -> "OVEREXPOSED"
+                            exposureResult.isOverexposed -> "OVEREXPOSED"
+                            exposureResult.isBacklit -> "STRONG BACKLIGHT"
+                            exposureResult.isGlare -> "HARSH GLARE"
+                            else -> "EXPOSURE WARNING"
                         }
                         Text(
                             text = label,

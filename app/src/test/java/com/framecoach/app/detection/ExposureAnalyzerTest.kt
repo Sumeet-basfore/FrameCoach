@@ -102,6 +102,27 @@ class ExposureAnalyzerTest {
         assertFalse(result.isWarning)
     }
 
+    @Test
+    fun `bright background with dark subject triggers backlight warning`() {
+        val size = W * H
+        val buf = ByteBuffer.allocateDirect(size)
+        val xMinInner = W * 0.25
+        val xMaxInner = W * 0.75
+        val yMinInner = H * 0.25
+        val yMaxInner = H * 0.75
+
+        for (y in 0 until H) {
+            for (x in 0 until W) {
+                val isInner = x >= xMinInner && x <= xMaxInner && y >= yMinInner && y <= yMaxInner
+                buf.put(if (isInner) 20.toByte() else 230.toByte())
+            }
+        }
+        buf.rewind()
+        val result = analyzer.analyse(buf, W, H)
+        assertTrue(result.isBacklit)
+        assertTrue(result.isWarning)
+    }
+
     // ---------------------------------------------------------------------------
     // Helpers
     // ---------------------------------------------------------------------------

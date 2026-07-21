@@ -38,15 +38,17 @@ object HorizonLevelCalculator {
      */
     fun compute(
         rollDeg: Float,
+        rollOffset: Float = 0.0f,
         threshold: Float = LEVEL_THRESHOLD_DEG,
     ): HorizonLevelState {
-        val isLevel = abs(rollDeg) <= threshold
+        val calibratedRoll = rollDeg - rollOffset
+        val isLevel = abs(calibratedRoll) <= threshold
         // Normalise roll to [-1, 1] clamped at ±45° so the overlay line doesn't
         // go off-screen on extreme tilts.
-        val clampedRoll = rollDeg.coerceIn(-45f, 45f)
+        val clampedRoll = calibratedRoll.coerceIn(-45f, 45f)
         val normalisedTilt = clampedRoll / 45f
         return HorizonLevelState(
-            rollDeg = rollDeg,
+            rollDeg = calibratedRoll,
             isLevel = isLevel,
             normalisedTilt = normalisedTilt,
         )

@@ -22,13 +22,7 @@ object CompositionState {
     val suggestion: StateFlow<CompositionSuggestion> = _suggestion.asStateFlow()
 
     fun update(boxes: List<BoundingBox>, style: String = "rule_of_thirds", mode: String = "general", sensitivity: Float = 0.42f) {
-        val suggestion = when {
-            boxes.isEmpty() -> CompositionSuggestion.GOOD
-            else -> {
-                val largestBox = boxes.maxByOrNull { it.area }!!
-                CompositionRules.analyse(largestBox, style, mode, _suggestion.value, sensitivity)
-            }
-        }
+        val suggestion = CompositionRules.analyseMulti(boxes, style, mode, _suggestion.value, sensitivity)
         _suggestion.value = suggestion
     }
 }

@@ -24,9 +24,15 @@ Ordered roughly in build sequence. Each ticket is scoped to be usable as a stand
 - *Priority:* Must-have
 
 **T4 — Port the composition rules engine to Kotlin**
-- *Description:* Port the logic validated in T2 into the `rules/` package — takes a bounding box + frame dimensions, returns a directional suggestion and a "good zone" boolean.
-- *Acceptance criteria:* Unit tests cover at least: centered subject, off-center-left subject, subject too small (needs to get closer), subject too large (needs to step back).
+- *Description:* Port the logic validated in T2 into the `rules/` package — takes a bounding box + frame dimensions, returns a directional suggestion and a "good zone" boolean. Fill-ratio scoring should target the nearest of three statistical peaks (~10%, 56%, 82% of frame area — corresponding to wide/medium/close shots) via a quadratic cost function, rather than a single arbitrary "ideal size."
+- *Acceptance criteria:* Unit tests cover at least: centered subject, off-center-left subject, subject near each of the three fill-ratio peaks, and a subject between two peaks (should resolve to the nearest one).
 - *Dependencies:* T2, T3
+- *Priority:* Must-have
+
+**T4B — Anti-oscillation guard for directional guidance**
+- *Description:* Add a minimum-improvement threshold before the rules engine changes its directional suggestion, and a sanity bound on how large a repositioning it will ever suggest. Addresses a documented Camera Coach failure mode: contradictory step-by-step instructions and physically unreasonable demands.
+- *Acceptance criteria:* Given a subject hovering near a decision boundary (e.g. right at the edge between two grid thirds), the suggested direction does not flip on every frame — it requires a sustained delta before switching. Suggested repositioning never exceeds a bounded magnitude.
+- *Dependencies:* T4
 - *Priority:* Must-have
 
 **T5 — Grid + directional overlay UI**
@@ -42,8 +48,8 @@ Ordered roughly in build sequence. Each ticket is scoped to be usable as a stand
 - *Priority:* Must-have
 
 **T7 — Frame-rate throttling / adaptive performance**
-- *Description:* Add logic to skip detection on every Nth frame, with the skip rate adjusting upward if per-frame processing time trends toward the device's thermal/performance limit.
-- *Acceptance criteria:* On a mid-range test device, a 5-minute continuous session shows no visible preview stutter and no thermal throttling warning.
+- *Description:* Add logic to skip detection on every Nth frame, with the skip rate adjusting based on the device's actual thermal status via `PowerManager.addThermalStatusListener` (API 29+) — not inferred from frame-processing time trends alone. Step down thread count and/or target FPS as thermal status escalates.
+- *Acceptance criteria:* On a Snapdragon 680-class test device, a 10-minute continuous session (the window where budget SoCs typically begin throttling) shows the app proactively reducing detection frequency before the OS forces a hard throttle.
 - *Dependencies:* T3
 - *Priority:* Must-have
 
@@ -82,3 +88,47 @@ Ordered roughly in build sequence. Each ticket is scoped to be usable as a stand
 - *Acceptance criteria:* Mode selectable from the bottom sheet; rules engine behavior visibly differs from general mode on the same test scene.
 - *Dependencies:* T4, T10
 - *Priority:* Nice-to-have (v2)
+
+**T14 — Golden ratio target points in rules engine**
+- *Description:* Extend the rules engine to compute a second set of target points using golden ratio proportions (~38.2%/61.8%, vs. the existing rule-of-thirds 33%/67%) — same calculation, different constant. Add auto-selection logic: given the subject's current position, compute the required correction under both the thirds points and the golden points, and use whichever needs the smaller correction. Output which system was selected so the UI layer knows what to render.
+- *Acceptance criteria:* Unit tests confirm the engine picks thirds vs. golden correctly based on which set of points is nearer to the subject's current position for a range of test positions.
+- *Dependencies:* T4
+- *Priority:* Must-have
+
+**T15 — Golden ratio grid rendering**
+- *Description:* Extend the existing grid-drawing Canvas code to also support golden ratio line positions — same rendering logic as the rule-of-thirds grid, fed different coordinates.
+- *Acceptance criteria:* Grid lines visibly shift to golden ratio positions when the rules engine selects golden mode.
+- *Dependencies:* T5, T14
+- *Priority:* Must-have
+
+**T16 — Golden spiral rendering**
+- *Description:* New Canvas path drawing a logarithmic (Fibonacci) spiral, oriented so its focal point lands on whichever of the four golden ratio target points the rules engine selected. This is the one genuinely new piece of rendering work in this feature — T14 and T15 are extensions of code that already exists.
+- *Acceptance criteria:* Spiral renders correctly oriented for all four possible target points and visually converges on the correct focal point in each case.
+- *Dependencies:* T5, T14
+- *Priority:* Must-have
+
+**T17 — Golden ratio style setting (Grid vs. Spiral)**
+- *Description:* Add a Settings toggle for which visual style to use when golden mode is active. Purely a rendering preference — doesn't affect the auto-selection logic in T14, only which of T15/T16 gets drawn.
+- *Acceptance criteria:* Toggle persists across restarts (same pattern as T10); switching it changes only the visual style, not which target point was selected.
+- *Dependencies:* T10, T15, T16
+- *Priority:* Should-have
+
+**T18 — Multi-subject centroid weighting & anti-jitter filter**
+- *Description:* Composite weighted center of mass calculation for multi-subject scenes with 5-frame EMA smoothing buffer.
+- *Acceptance criteria:* Multi-subject centroid balances spatial weight without single-frame detection drops causing arrow direction flips.
+- *Priority:* Should-have
+
+**T19 — Horizon zero-point calibration**
+- *Description:* User zero-point calibration for phone mounts/tripods stored in AppPreferences.
+- *Acceptance criteria:* Calibration offset persists and shifts zero-degree level threshold accurately.
+- *Priority:* Should-have
+
+**T20 — Quadrant backlight & glare warning**
+- *Description:* 4-quadrant Y-plane luminance matrix analysis detecting strong backlighting and harsh direct glare.
+- *Acceptance criteria:* "STRONG BACKLIGHT" and "HARSH GLARE" badges display when background vs. subject contrast exceeds thresholds.
+- *Priority:* Should-have
+
+**T21 — Stealth viewfinder auto-dimming**
+- *Description:* Auto-fading secondary controls after 1.5s in the Good Zone for ultra-clean photography.
+- *Acceptance criteria:* HUD controls dim to 35% opacity while subject is framing-aligned, restoring instantly on touch or position loss.
+- *Priority:* Nice-to-have

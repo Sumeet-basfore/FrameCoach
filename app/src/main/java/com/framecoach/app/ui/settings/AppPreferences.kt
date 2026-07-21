@@ -31,6 +31,8 @@ class AppPreferences(context: Context) {
         const val KEY_ONBOARDING_SHOWN = "onboarding_shown"
         /** Audio coaching cues via on-device TTS (C1). Off by default. */
         const val KEY_AUDIO_COACHING_ENABLED = "audio_coaching_enabled"
+        /** Roll angle zero-point calibration offset (T19). */
+        const val KEY_HORIZON_ROLL_OFFSET = "horizon_roll_offset"
 
         const val MODE_GENERAL = "general"
         const val MODE_PORTRAIT = "portrait"
@@ -161,5 +163,22 @@ class AppPreferences(context: Context) {
     fun setAudioCoachingEnabled(enabled: Boolean) {
         prefs.edit().putBoolean(KEY_AUDIO_COACHING_ENABLED, enabled).apply()
         _audioCoachingEnabled.value = enabled
+    }
+
+    // -------------------------------------------------------------------------
+    // Horizon zero-point calibration (T19)
+    // -------------------------------------------------------------------------
+
+    private val _horizonRollOffset = MutableStateFlow(
+        prefs.getFloat(KEY_HORIZON_ROLL_OFFSET, 0f)
+    )
+
+    /** Roll angle offset calibration for accelerometer. */
+    val horizonRollOffset: StateFlow<Float> = _horizonRollOffset.asStateFlow()
+
+    /** Persist and publish a new [horizonRollOffset] value. */
+    fun setHorizonRollOffset(offset: Float) {
+        prefs.edit().putFloat(KEY_HORIZON_ROLL_OFFSET, offset).apply()
+        _horizonRollOffset.value = offset
     }
 }

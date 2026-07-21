@@ -47,6 +47,44 @@ object CompositionRules {
     // Public API
     // -------------------------------------------------------------------------
 
+    /**
+     * Analyse multiple detected subject boxes by computing their composite weighted centroid.
+     */
+    fun analyseMulti(
+        boxes: List<BoundingBox>,
+        style: String = "rule_of_thirds",
+        mode: String = "general",
+        previousSuggestion: CompositionSuggestion? = null,
+        sensitivity: Float = 0.42f
+    ): CompositionSuggestion {
+        if (boxes.isEmpty()) {
+            return CompositionSuggestion.GOOD
+        }
+        if (boxes.size == 1) {
+            return analyse(boxes.first(), style, mode, previousSuggestion, sensitivity)
+        }
+
+        val totalArea = boxes.sumOf { it.area.toDouble() }.toFloat().coerceAtMost(1.0f)
+        val sumArea = boxes.sumOf { it.area.toDouble() }.toFloat().coerceAtLeast(0.0001f)
+        val weightedX = (boxes.sumOf { (it.area * it.centerX).toDouble() }.toFloat() / sumArea).coerceIn(0f, 1f)
+        val weightedY = (boxes.sumOf { (it.area * it.centerY).toDouble() }.toFloat() / sumArea).coerceIn(0f, 1f)
+
+        val side = Math.sqrt(totalArea.toDouble()).toFloat().coerceIn(0.05f, 0.95f)
+        val halfSide = side / 2f
+        val left = (weightedX - halfSide).coerceIn(0f, (1f - side).coerceAtLeast(0f))
+        val top = (weightedY - halfSide).coerceIn(0f, (1f - side).coerceAtLeast(0f))
+        val compositeBox = BoundingBox(
+            label = "composite",
+            confidence = 1.0f,
+            left = left,
+            top = top,
+            right = left + side,
+            bottom = top + side
+        )
+
+        return analyse(compositeBox, style, mode, previousSuggestion, sensitivity)
+    }
+
     fun analyse(
         box: BoundingBox,
         style: String = "rule_of_thirds",

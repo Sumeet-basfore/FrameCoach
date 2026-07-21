@@ -54,10 +54,19 @@ class ExposureAnalyzer {
 
         var totalLuma = 0.0
         var sampleCount = 0
+        var innerLumaSum = 0.0
+        var innerCount = 0
+        var outerLumaSum = 0.0
+        var outerCount = 0
 
         // Duplicate buffer so we don't disturb the caller's position.
         val buf = yBuffer.duplicate()
         buf.rewind()
+
+        val xMinInner = width * 0.25f
+        val xMaxInner = width * 0.75f
+        val yMinInner = height * 0.25f
+        val yMaxInner = height * 0.75f
 
         for (y in 0 until height step yStep) {
             for (x in 0 until width step xStep) {
@@ -65,17 +74,33 @@ class ExposureAnalyzer {
                 if (index >= buf.capacity()) continue
                 buf.position(index)
                 val pixel = buf.get().toInt() and 0xFF
-                totalLuma += pixel / MAX_8BIT
+                val luma = pixel / MAX_8BIT
+                totalLuma += luma
                 sampleCount++
+
+                if (x >= xMinInner && x <= xMaxInner && y >= yMinInner && y <= yMaxInner) {
+                    innerLumaSum += luma
+                    innerCount++
+                } else {
+                    outerLumaSum += luma
+                    outerCount++
+                }
             }
         }
 
         val meanLuminance = if (sampleCount > 0) (totalLuma / sampleCount).toFloat() else 0.5f
+        val innerLuma = if (innerCount > 0) (innerLumaSum / innerCount).toFloat() else meanLuminance
+        val outerLuma = if (outerCount > 0) (outerLumaSum / outerCount).toFloat() else meanLuminance
+
+        val isBacklit = (outerLuma - innerLuma) > 0.35f && meanLuminance < 0.75f
+        val isGlare = (innerLuma - outerLuma) > 0.45f
 
         return ExposureResult(
             meanLuminance = meanLuminance,
             isUnderexposed = meanLuminance < UNDEREXPOSED_THRESHOLD,
             isOverexposed = meanLuminance > OVEREXPOSED_THRESHOLD,
+            isBacklit = isBacklit,
+            isGlare = isGlare,
         )
     }
 }
@@ -87,12 +112,16 @@ class ExposureAnalyzer {
  *                          0 = pure black, 1 = pure white.
  * @property isUnderexposed True when [meanLuminance] < [ExposureAnalyzer.UNDEREXPOSED_THRESHOLD].
  * @property isOverexposed  True when [meanLuminance] > [ExposureAnalyzer.OVEREXPOSED_THRESHOLD].
+ * @property isBacklit      True when outer background is significantly brighter than inner subject.
+ * @property isGlare        True when direct harsh center highlight is detected.
  */
 data class ExposureResult(
     val meanLuminance: Float,
     val isUnderexposed: Boolean,
     val isOverexposed: Boolean,
+    val isBacklit: Boolean = false,
+    val isGlare: Boolean = false,
 ) {
-    /** True when the scene is significantly over- or underexposed. */
-    val isWarning: Boolean get() = isUnderexposed || isOverexposed
+    /** True when the scene is over/underexposed, backlit, or suffers from glare. */
+    val isWarning: Boolean get() = isUnderexposed || isOverexposed || isBacklit || isGlare
 }
