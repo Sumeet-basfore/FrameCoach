@@ -63,58 +63,34 @@ All must-have tickets T1–T7, should-have T8–T10, and nice-to-have T11–T13 
   - `CameraScreen`: collects exposure state and shows yellow "UNDEREXPOSED" / "OVEREXPOSED" badge at top-left
   - 10 unit tests covering boundaries, checkerboard, small/asymmetric frames
 - **T13**: Product photography preset mode - completed
-  - `CompositionRules.analyse()`: new `mode` param (`"general"`, `"portrait"`, `"product"`)
-  - Product mode: centered positioning band [0.35, 0.65] instead of thirds, tighter fill-ratio peaks at 35% and 62%
-  - `CompositionState.update()`: threads `mode` to rules engine
-  - `CameraPreview`: passes `currentMode` to `CompositionState.update()`
-  - `CameraScreen`: PRODUCT button added to mode selector row
-  - 5 unit tests verifying product mode differs from general for same scene
+- **T14/T15**: Golden ratio target points & grid rendering (38.2%/61.8% vs 33%/67%) - completed
+- **T16**: Golden ratio logarithmic Fibonacci spiral rendering - completed
+- **T17**: Jetpack Compose instrumented UI test suite (`CameraHudUiTest`) - completed
+- **T18**: Multi-subject centroid weighting & anti-jitter filter (`CompositionRules.analyseMulti`) - completed
+- **T19**: Horizon zero-point calibration (`HorizonLevelCalculator` & `AppPreferences`) - completed
+- **T20**: Quadrant backlight & glare warning (`ExposureAnalyzer` Y-plane luma matrix) - completed
+- **T21**: Stealth viewfinder auto-dimming - completed
+- **Codebase Error Audit / Cleanup**: Thread-safe MediaPipe close lock, organic HUD design system tokens, lifecycle-safe haptics - completed
+- **A1**: Release prep (v1.0) with ProGuard rules, signing setup, R8 shrinking - completed
+- **B1**: Onboarding overlay - completed
+- **B2**: Accessibility content descriptions - completed
+- **C1**: Audio coaching cues (TTS) - completed
+- **C2**: Offline Shot history log (Room DB) - completed
+- **D2**: GitHub Actions CI pipeline (`android_ci.yml`) - completed
 
-- **Codebase Error Audit / Cleanup**:
-  - Addressed potential race conditions in MediaPipe's `ObjectDetector` and `FaceDetector` helpers during lifecycle transitions. Introduced synchronized blocks with a thread-safe `closeLock` and `@Volatile` `isClosed` flag to prevent calling `detect()` on closed detectors and to avoid concurrent resource cleanup/inference execution.
-  - Refined grid overlay design to strictly follow `04_Frontend_Specification_Document.md` spacing and color roles. Replaced hardcoded material colors with Catppuccin Mocha tokens (`MochaGreen` for good zone, `MochaOverlay1` at 40% opacity for default grid, `MochaPeach` for directional adjustments, `MochaRed` for limits).
-  - Standardized state lifecycle tracking for haptic controls in `CameraScreen` by keying `LaunchedEffect` with the dynamic `hapticsEnabled` state.
+### Architecture Highlights
+- 100% offline, zero network permissions.
+- MediaPipe EfficientDet-Lite0 & BlazeFace INT8 quantized models.
+- Pure Kotlin rules engine with anti-jitter EMA and anti-oscillation bounds.
+- Room offline local Shot Database.
+- Jetpack Compose Canvas organic HUD with Catppuccin Mocha theme palette.
 
-- **A1 — Release prep** (v1.0):
-  - `versionName` bumped to `1.0.0`; signing config reads `KEYSTORE_PATH / KEYSTORE_PASSWORD / KEY_ALIAS / KEY_PASSWORD` from `local.properties` or env vars; `isShrinkResources = true` added.
-  - `AndroidManifest.xml`: `WRITE_EXTERNAL_STORAGE` (maxSdkVersion 28), camera `required="true"`, absence of `INTERNET` documented.
-
-- **A3 — Store copy & strings**:
-  - App renamed from "Frame" → "FrameCoach" in `strings.xml`. Permission rationale updated. Accessibility `contentDescription` string resources added.
-
-- **B1 — First-launch onboarding overlay**:
-  - `AppPreferences`: `KEY_ONBOARDING_SHOWN` + `onboardingShown: StateFlow<Boolean>` + `setOnboardingShown()`.
-  - `OnboardingOverlay` (`ui/overlay/`): animated Compose overlay with three tips (grid, directional arrows, good-zone pulse), "Got it" button. Shown once on first install.
-  - `CameraScreen`: renders `OnboardingOverlay` when `!onboardingShown`.
-  - 4 new unit tests in `OnboardingPreferenceTest`.
-
-- **B2 — Accessibility content descriptions**:
-  - `CameraScreen`: shutter, settings gear, flash toggle, zoom in/out, mode tabs — all carry `contentDescription`.
-  - `OnboardingOverlay`: dismiss button carries semantic label.
-
-- **C1 — Audio coaching cues**:
-  - `AudioCoach` (`ui/overlay/`): Android on-device `TextToSpeech` wrapper firing speech cues only on direction-change edges (same edge-fire pattern as `GoodZoneEdgeDetector`).
-  - `AppPreferences`: added `audioCoachingEnabled` (defaults to false / off by default).
-  - `SettingsScreen`: added "Audio coaching" toggle row under Viewfinder section.
-  - `CameraScreen`: wired `AudioCoach` lifecycle with `DisposableEffect` and dynamic preference gating.
-  - Unit tests in `AudioCoachTest.kt` verifying cue mapping and `DirectionGate` edge-suppression logic.
-
-- **C2 — Local shot history log**:
-  - `ShotRecord` (`data/db/`): Room entity capturing `id`, `timestamp`, `imageUri`, `mode`, `isGoodZone`, `suggestion`, `compositionStyle`.
-  - `ShotRecordDao` + `AppDatabase` + `ShotHistoryRepository`: offline Room database & DAO operations (100% on-device, no cloud/sync).
-  - `CameraScreen`: wired shot recording on photo capture success.
-  - `ShotRecordTest`: unit tests for shot record metadata mapping.
-
-- **D2 — GitHub Actions CI pipeline**:
-  - `.github/workflows/android_ci.yml`: automated workflow executing JDK 17 setup, Gradle caching, `./gradlew testDebugUnitTest`, and `./gradlew assembleDebug` on push/PR to `main`.
-
-### Next Steps / Up Next
+## Next Steps / Up Next
 - **A2**: Physical device matrix test (budget → flagship, API 24 boundary)
 - **B3**: Landscape orientation lock already applied in manifest; verify overlay Canvas math if needed
 - **D1**: Compose instrumented UI tests
 
 v2+ deferred enhancements:
-- Audio coaching cues
 - Video recording with overlays burned in
 - Cloud sync for shot history
 - Learned aesthetic scoring model
