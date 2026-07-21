@@ -99,12 +99,19 @@ All must-have tickets T1–T7, should-have T8–T10, and nice-to-have T11–T13 
   - `CameraScreen`: wired `AudioCoach` lifecycle with `DisposableEffect` and dynamic preference gating.
   - Unit tests in `AudioCoachTest.kt` verifying cue mapping and `DirectionGate` edge-suppression logic.
 
+- **C2 — Local shot history log**:
+  - `ShotRecord` (`data/db/`): Room entity capturing `id`, `timestamp`, `imageUri`, `mode`, `isGoodZone`, `suggestion`, `compositionStyle`.
+  - `ShotRecordDao` + `AppDatabase` + `ShotHistoryRepository`: offline Room database & DAO operations (100% on-device, no cloud/sync).
+  - `CameraScreen`: wired shot recording on photo capture success.
+  - `ShotRecordTest`: unit tests for shot record metadata mapping.
+
+- **D2 — GitHub Actions CI pipeline**:
+  - `.github/workflows/android_ci.yml`: automated workflow executing JDK 17 setup, Gradle caching, `./gradlew testDebugUnitTest`, and `./gradlew assembleDebug` on push/PR to `main`.
+
 ### Next Steps / Up Next
-- **C2**: Shot history log (Room, local-only, no sync)
 - **A2**: Physical device matrix test (budget → flagship, API 24 boundary)
 - **B3**: Landscape orientation lock already applied in manifest; verify overlay Canvas math if needed
 - **D1**: Compose instrumented UI tests
-- **D2**: GitHub Actions CI pipeline
 
 v2+ deferred enhancements:
 - Audio coaching cues
