@@ -32,7 +32,7 @@ class FaceDetectorHelper(private val context: Context) {
         private const val MIN_CONFIDENCE = 0.5f
     }
 
-    private val detector: FaceDetector = createDetector()
+    private val detector: FaceDetector? = createDetector()
 
     // Serialise detector calls — FaceDetector is NOT thread-safe.
     private val detectorMutex = Mutex()
@@ -41,18 +41,23 @@ class FaceDetectorHelper(private val context: Context) {
     @Volatile
     private var isClosed = false
 
-    private fun createDetector(): FaceDetector {
-        val baseOptions = BaseOptions.builder()
-            .setModelAssetPath(MODEL_PATH)
-            .build()
+    private fun createDetector(): FaceDetector? {
+        return try {
+            val baseOptions = BaseOptions.builder()
+                .setModelAssetPath(MODEL_PATH)
+                .build()
 
-        val options = FaceDetector.FaceDetectorOptions.builder()
-            .setBaseOptions(baseOptions)
-            .setMinDetectionConfidence(MIN_CONFIDENCE)
-            .setRunningMode(RunningMode.IMAGE)
-            .build()
+            val options = FaceDetector.FaceDetectorOptions.builder()
+                .setBaseOptions(baseOptions)
+                .setMinDetectionConfidence(MIN_CONFIDENCE)
+                .setRunningMode(RunningMode.IMAGE)
+                .build()
 
-        return FaceDetector.createFromOptions(context, options)
+            FaceDetector.createFromOptions(context, options)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to create FaceDetector", e)
+            null
+        }
     }
 
     /**
@@ -64,6 +69,7 @@ class FaceDetectorHelper(private val context: Context) {
      * @return List of detected faces, sorted by confidence descending.
      */
     suspend fun detect(imageProxy: ImageProxy): List<BoundingBox> = detectorMutex.withLock {
+        val activeDetector = detector ?: return@withLock emptyList()
         synchronized(closeLock) {
             if (isClosed) return@withLock emptyList()
         }
@@ -74,7 +80,7 @@ class FaceDetectorHelper(private val context: Context) {
         val result: FaceDetectorResult? = synchronized(closeLock) {
             if (isClosed) null else {
                 try {
-                    detector.detect(mpImage)
+                    activeDetector.detect(mpImage)
                 } catch (e: Exception) {
                     Log.e(TAG, "MediaPipe face detection failed", e)
                     null
@@ -191,7 +197,11 @@ class FaceDetectorHelper(private val context: Context) {
         synchronized(closeLock) {
             if (!isClosed) {
                 isClosed = true
-                detector.close()
+                try {
+                    detector?.close()
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error closing FaceDetector", e)
+                }
             }
         }
     }

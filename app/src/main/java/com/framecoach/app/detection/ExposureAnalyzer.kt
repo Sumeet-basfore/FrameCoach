@@ -41,67 +41,76 @@ class ExposureAnalyzer {
     /**
      * Analyse a camera frame's luminance via its Y plane.
      *
-     * @param yBuffer  Direct access to the Y (luminance) plane of the frame.
-     *                 Position and limit should be at the start and end of
-     *                 the visible Y data (width × height bytes).
-     * @param width    Width of the Y plane in pixels.
-     * @param height   Height of the Y plane in pixels.
-     * @return         [ExposureResult] with the mean luminance and a warning flag.
+     * @param yBuffer   Direct access to the Y (luminance) plane of the frame.
+     * @param width     Width of the Y plane in pixels.
+     * @param height    Height of the Y plane in pixels.
+     * @param rowStride Row stride of the Y plane in bytes (defaults to width if unpadded).
+     * @return          [ExposureResult] with the mean luminance and a warning flag.
      */
-    fun analyse(yBuffer: ByteBuffer, width: Int, height: Int): ExposureResult {
-        val xStep = maxOf(1, width / GRID_SIZE)
-        val yStep = maxOf(1, height / GRID_SIZE)
+    fun analyse(yBuffer: ByteBuffer, width: Int, height: Int, rowStride: Int = width): ExposureResult {
+        return try {
+            val stride = if (rowStride >= width) rowStride else width
+            val xStep = maxOf(1, width / GRID_SIZE)
+            val yStep = maxOf(1, height / GRID_SIZE)
 
-        var totalLuma = 0.0
-        var sampleCount = 0
-        var innerLumaSum = 0.0
-        var innerCount = 0
-        var outerLumaSum = 0.0
-        var outerCount = 0
+            var totalLuma = 0.0
+            var sampleCount = 0
+            var innerLumaSum = 0.0
+            var innerCount = 0
+            var outerLumaSum = 0.0
+            var outerCount = 0
 
-        // Duplicate buffer so we don't disturb the caller's position.
-        val buf = yBuffer.duplicate()
-        buf.rewind()
+            val buf = yBuffer.duplicate()
+            buf.rewind()
 
-        val xMinInner = width * 0.25f
-        val xMaxInner = width * 0.75f
-        val yMinInner = height * 0.25f
-        val yMaxInner = height * 0.75f
+            val xMinInner = width * 0.25f
+            val xMaxInner = width * 0.75f
+            val yMinInner = height * 0.25f
+            val yMaxInner = height * 0.75f
 
-        for (y in 0 until height step yStep) {
-            for (x in 0 until width step xStep) {
-                val index = y * width + x
-                if (index >= buf.capacity()) continue
-                buf.position(index)
-                val pixel = buf.get().toInt() and 0xFF
-                val luma = pixel / MAX_8BIT
-                totalLuma += luma
-                sampleCount++
+            for (y in 0 until height step yStep) {
+                for (x in 0 until width step xStep) {
+                    val index = y * stride + x
+                    if (index < 0 || index >= buf.limit()) continue
+                    buf.position(index)
+                    val pixel = buf.get().toInt() and 0xFF
+                    val luma = pixel / MAX_8BIT
+                    totalLuma += luma
+                    sampleCount++
 
-                if (x >= xMinInner && x <= xMaxInner && y >= yMinInner && y <= yMaxInner) {
-                    innerLumaSum += luma
-                    innerCount++
-                } else {
-                    outerLumaSum += luma
-                    outerCount++
+                    if (x >= xMinInner && x <= xMaxInner && y >= yMinInner && y <= yMaxInner) {
+                        innerLumaSum += luma
+                        innerCount++
+                    } else {
+                        outerLumaSum += luma
+                        outerCount++
+                    }
                 }
             }
+
+            val meanLuminance = if (sampleCount > 0) (totalLuma / sampleCount).toFloat() else 0.5f
+            val innerLuma = if (innerCount > 0) (innerLumaSum / innerCount).toFloat() else meanLuminance
+            val outerLuma = if (outerCount > 0) (outerLumaSum / outerCount).toFloat() else meanLuminance
+
+            val isBacklit = (outerLuma - innerLuma) > 0.35f && meanLuminance < 0.75f
+            val isGlare = (innerLuma - outerLuma) > 0.45f
+
+            ExposureResult(
+                meanLuminance = meanLuminance,
+                isUnderexposed = meanLuminance < UNDEREXPOSED_THRESHOLD,
+                isOverexposed = meanLuminance > OVEREXPOSED_THRESHOLD,
+                isBacklit = isBacklit,
+                isGlare = isGlare,
+            )
+        } catch (e: Exception) {
+            ExposureResult(
+                meanLuminance = 0.5f,
+                isUnderexposed = false,
+                isOverexposed = false,
+                isBacklit = false,
+                isGlare = false,
+            )
         }
-
-        val meanLuminance = if (sampleCount > 0) (totalLuma / sampleCount).toFloat() else 0.5f
-        val innerLuma = if (innerCount > 0) (innerLumaSum / innerCount).toFloat() else meanLuminance
-        val outerLuma = if (outerCount > 0) (outerLumaSum / outerCount).toFloat() else meanLuminance
-
-        val isBacklit = (outerLuma - innerLuma) > 0.35f && meanLuminance < 0.75f
-        val isGlare = (innerLuma - outerLuma) > 0.45f
-
-        return ExposureResult(
-            meanLuminance = meanLuminance,
-            isUnderexposed = meanLuminance < UNDEREXPOSED_THRESHOLD,
-            isOverexposed = meanLuminance > OVEREXPOSED_THRESHOLD,
-            isBacklit = isBacklit,
-            isGlare = isGlare,
-        )
     }
 }
 

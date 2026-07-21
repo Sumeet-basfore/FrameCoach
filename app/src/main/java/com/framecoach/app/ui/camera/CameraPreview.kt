@@ -130,32 +130,28 @@ fun CameraPreview(
                     // ImageProxy lifetime is managed here — close in finally so it is
                     // never leaked regardless of cancellation, exception, or success.
                     imageAnalysis.setAnalyzer(mainExecutor) { imageProxy: ImageProxy ->
-                        // T12: extract Y plane for exposure analysis BEFORE processFrame
-                        // closes the ImageProxy.
-                        val yPlane = imageProxy.planes.getOrNull(0)
-                        if (yPlane != null) {
-                            val yBuffer = yPlane.buffer.duplicate()
-                            yBuffer.rewind()
-                            val exposureResult = exposureAnalyzer.analyse(
-                                yBuffer, imageProxy.width, imageProxy.height
-                            )
-                            ExposureState.update(exposureResult)
-                        }
-
-                        val job = coroutineScope.launch {
+                        coroutineScope.launch {
                             try {
+                                // T12: extract Y plane for exposure analysis before processing/closing
+                                val yPlane = imageProxy.planes.getOrNull(0)
+                                if (yPlane != null) {
+                                    try {
+                                        val yBuffer = yPlane.buffer.duplicate()
+                                        yBuffer.rewind()
+                                        val exposureResult = exposureAnalyzer.analyse(
+                                            yBuffer, imageProxy.width, imageProxy.height, yPlane.rowStride
+                                        )
+                                        ExposureState.update(exposureResult)
+                                    } catch (e: Exception) {
+                                        android.util.Log.e("CameraPreview", "Exposure analysis failed", e)
+                                    }
+                                }
+
                                 val boxes = frameProcessor.processFrame(imageProxy, currentMode.value)
-                                // MutableStateFlow.value is thread-safe; no Main dispatcher needed.
                                 CompositionState.update(boxes, currentStyle.value, currentMode.value, currentSensitivity.value)
                             } catch (e: Exception) {
-                                // FrameProcessor.processFrame already closes the proxy in finally,
-                                // but guard against any early-exit path.
-                                imageProxy.close()
-                            }
-                        }
-                        job.invokeOnCompletion { throwable ->
-                            if (throwable != null) {
-                                imageProxy.close()
+                                android.util.Log.e("CameraPreview", "Frame processing failed", e)
+                                try { imageProxy.close() } catch (_: Exception) {}
                             }
                         }
                     }

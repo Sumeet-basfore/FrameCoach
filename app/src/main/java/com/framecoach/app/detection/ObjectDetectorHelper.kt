@@ -34,7 +34,7 @@ class ObjectDetectorHelper(private val context: Context) {
         private const val MAX_RESULTS = 3
     }
 
-    private val detector: ObjectDetector = createDetector()
+    private val detector: ObjectDetector? = createDetector()
 
     // Serialise detector calls — ObjectDetector is NOT thread-safe.
     private val detectorMutex = Mutex()
@@ -43,19 +43,24 @@ class ObjectDetectorHelper(private val context: Context) {
     @Volatile
     private var isClosed = false
 
-    private fun createDetector(): ObjectDetector {
-        val baseOptions = BaseOptions.builder()
-            .setModelAssetPath(MODEL_PATH)
-            .build()
+    private fun createDetector(): ObjectDetector? {
+        return try {
+            val baseOptions = BaseOptions.builder()
+                .setModelAssetPath(MODEL_PATH)
+                .build()
 
-        val options = ObjectDetector.ObjectDetectorOptions.builder()
-            .setBaseOptions(baseOptions)
-            .setScoreThreshold(SCORE_THRESHOLD)
-            .setMaxResults(MAX_RESULTS)
-            .setRunningMode(RunningMode.IMAGE)
-            .build()
+            val options = ObjectDetector.ObjectDetectorOptions.builder()
+                .setBaseOptions(baseOptions)
+                .setScoreThreshold(SCORE_THRESHOLD)
+                .setMaxResults(MAX_RESULTS)
+                .setRunningMode(RunningMode.IMAGE)
+                .build()
 
-        return ObjectDetector.createFromOptions(context, options)
+            ObjectDetector.createFromOptions(context, options)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to create ObjectDetector", e)
+            null
+        }
     }
 
     /**
@@ -68,6 +73,7 @@ class ObjectDetectorHelper(private val context: Context) {
      * @return List of detected objects, sorted by confidence descending (highest first).
      */
     suspend fun detect(imageProxy: ImageProxy): List<BoundingBox> = detectorMutex.withLock {
+        val activeDetector = detector ?: return@withLock emptyList()
         synchronized(closeLock) {
             if (isClosed) return@withLock emptyList()
         }
@@ -78,7 +84,7 @@ class ObjectDetectorHelper(private val context: Context) {
         val result: ObjectDetectionResult? = synchronized(closeLock) {
             if (isClosed) null else {
                 try {
-                    detector.detect(mpImage)
+                    activeDetector.detect(mpImage)
                 } catch (e: Exception) {
                     Log.e(TAG, "MediaPipe object detection failed", e)
                     null
@@ -212,7 +218,11 @@ class ObjectDetectorHelper(private val context: Context) {
         synchronized(closeLock) {
             if (!isClosed) {
                 isClosed = true
-                detector.close()
+                try {
+                    detector?.close()
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error closing ObjectDetector", e)
+                }
             }
         }
     }

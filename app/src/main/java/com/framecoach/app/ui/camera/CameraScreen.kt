@@ -251,75 +251,82 @@ fun CameraScreen(
     // Function to take a picture and save it to the gallery
     fun takePicture(capture: androidx.camera.core.ImageCapture?) {
         if (capture == null) return
-        val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.US).format(java.util.Date())
-        val contentValues = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, "IMG_$timestamp.jpg")
-            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                put(
-                    MediaStore.Images.Media.RELATIVE_PATH,
-                    android.os.Environment.DIRECTORY_DCIM + "/Camera"
-                )
-            }
-        }
-        val resolver = context.contentResolver
-        val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-        } else {
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        }
-        val outputFileOptions = OutputFileOptions.Builder(resolver, collection, contentValues).build()
-        capture.takePicture(
-            outputFileOptions,
-            androidx.core.content.ContextCompat.getMainExecutor(context),
-            object : androidx.camera.core.ImageCapture.OnImageSavedCallback {
-                override fun onError(exc: androidx.camera.core.ImageCaptureException) {
-                    Log.e("CameraScreen", "Photo capture failed: ${exc.message}", exc)
-                    Toast.makeText(context, "Photo capture failed: ${exc.message}", Toast.LENGTH_SHORT).show()
-                }
-
-                override fun onImageSaved(output: androidx.camera.core.ImageCapture.OutputFileResults) {
-                    val savedUriString = output.savedUri?.toString() ?: ""
-                    val msg = "Photo saved"
-                    Log.d("CameraScreen", msg)
-                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-
-                    // Calculate score and metadata at capture time
-                    val currentSuggestion = CompositionState.suggestion.value
-                    val currentRoll = horizonSensor.rollDeg.value
-                    val isHorizonLevel = HorizonLevelCalculator.compute(currentRoll).isLevel
-
-                    // Score calculation:
-                    // base 60. good zone = +30. level horizon = +10. alignment bonus up to 10.
-                    var score = 50
-                    if (currentSuggestion.isGood) score += 30
-                    if (isHorizonLevel) score += 10
-                    val rollError = Math.abs(currentRoll)
-                    val alignmentBonus = (10f - rollError).coerceIn(0f, 10f).toInt()
-                    score += alignmentBonus
-
-                    capturedPhotoScore = score.coerceIn(0, 100)
-                    capturedPhotoStyle = when (compositionStyle) {
-                        "golden_ratio" -> "Golden Ratio"
-                        "center_grid" -> "Center Grid"
-                        else -> "Rule of Thirds"
-                    }
-                    capturedPhotoHorizonLevel = isHorizonLevel
-                    capturedPhotoUri = savedUriString
-
-                    // C2: record shot in local Room history DB
-                    scope.launch {
-                        shotHistoryRepo.recordShot(
-                            imageUri = savedUriString,
-                            mode = cameraMode,
-                            isGoodZone = currentSuggestion.isGood,
-                            suggestion = currentSuggestion.direction.displayText,
-                            compositionStyle = compositionStyle,
-                        )
-                    }
+        try {
+            val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.US).format(java.util.Date())
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, "IMG_$timestamp.jpg")
+                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    put(
+                        MediaStore.Images.Media.RELATIVE_PATH,
+                        android.os.Environment.DIRECTORY_DCIM + "/Camera"
+                    )
                 }
             }
-        )
+            val resolver = context.contentResolver
+            val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                MediaStore.Images.Media.getContentUri("external_primary")
+            } else {
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            }
+            val outputFileOptions = OutputFileOptions.Builder(resolver, collection, contentValues).build()
+            capture.takePicture(
+                outputFileOptions,
+                androidx.core.content.ContextCompat.getMainExecutor(context),
+                object : androidx.camera.core.ImageCapture.OnImageSavedCallback {
+                    override fun onError(exc: androidx.camera.core.ImageCaptureException) {
+                        Log.e("CameraScreen", "Photo capture failed: ${exc.message}", exc)
+                        Toast.makeText(context, "Photo capture failed: ${exc.message}", Toast.LENGTH_SHORT).show()
+                    }
+
+                    override fun onImageSaved(output: androidx.camera.core.ImageCapture.OutputFileResults) {
+                        val savedUriString = output.savedUri?.toString() ?: ""
+                        val msg = "Photo saved"
+                        Log.d("CameraScreen", msg)
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+
+                        // Calculate score and metadata at capture time
+                        val currentSuggestion = CompositionState.suggestion.value
+                        val currentRoll = horizonSensor.rollDeg.value
+                        val isHorizonLevel = HorizonLevelCalculator.compute(currentRoll).isLevel
+
+                        var score = 50
+                        if (currentSuggestion.isGood) score += 30
+                        if (isHorizonLevel) score += 10
+                        val rollError = Math.abs(currentRoll)
+                        val alignmentBonus = (10f - rollError).coerceIn(0f, 10f).toInt()
+                        score += alignmentBonus
+
+                        capturedPhotoScore = score.coerceIn(0, 100)
+                        capturedPhotoStyle = when (compositionStyle) {
+                            "golden_ratio" -> "Golden Ratio"
+                            "center_grid" -> "Center Grid"
+                            else -> "Rule of Thirds"
+                        }
+                        capturedPhotoHorizonLevel = isHorizonLevel
+                        capturedPhotoUri = savedUriString
+
+                        // C2: record shot in local Room history DB
+                        scope.launch {
+                            try {
+                                shotHistoryRepo.recordShot(
+                                    imageUri = savedUriString,
+                                    mode = cameraMode,
+                                    isGoodZone = currentSuggestion.isGood,
+                                    suggestion = currentSuggestion.direction.displayText,
+                                    compositionStyle = compositionStyle,
+                                )
+                            } catch (e: Exception) {
+                                Log.e("CameraScreen", "Failed to record shot history", e)
+                            }
+                        }
+                    }
+                }
+            )
+        } catch (e: Exception) {
+            Log.e("CameraScreen", "Error launching takePicture", e)
+            Toast.makeText(context, "Capture error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+        }
     }
 
     when (permissionState) {
